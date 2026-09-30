@@ -1,0 +1,1 @@
+Toggle vampire night vision with natural colours or blend to black and white in 5% steps. Adjust brightness independently, with keyboard and controller shortcuts and live Mod Settings controls. Inspired by Night Vision by opogode, made with permission.

@@ -1,0 +1,45 @@
+{
+  "title": "Night Vision - Configurable",
+  "game": "thebloodofdawnwalker",
+  "category": "Visuals",
+  "author": "oOCamilleOo",
+  "language": "English",
+  "version": "0.1.0",
+  "source": "https://github.com/my-mods/Night-Vision-Configurable",
+  "tags": ["Gameplay", "Quality of Life", "AI-Generated Content", "AI Media"],
+  "summaryFile": "summary.txt",
+  "descriptionFile": "description.bbcode",
+  "permissionsFile": "permissions.txt",
+  "file": {
+    "name": "Night Vision - Configurable",
+    "archive": "Night-Vision-Configurable.zip",
+    "version": "0.1.0",
+    "category": "main",
+    "descriptionFile": "file-description.txt",
+    "allowModManagerDownload": true,
+    "primaryModManagerDownload": true,
+    "showRequirementsPopUp": true
+  },
+  "requirements": [
+    {
+      "anyOf": [
+        {"name": "UE4SS for Dawnwalker", "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/18"},
+        {"name": "UE4SS for BoD", "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/283"}
+      ],
+      "note": "Install one Dawnwalker-compatible UE4SS package with Lua 5.4, game-thread delayed actions, cancellation and native function hooks."
+    },
+    {
+      "name": "Mod Setting Menu",
+      "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/271",
+      "minimumVersion": "1.0.6",
+      "optional": true,
+      "note": "Optional settings UI and live Apply. The console bridge needs HookProcessConsoleExec=1 in the UE4SS profile."
+    }
+  ],
+  "inspiration": {
+    "name": "Night Vision",
+    "author": "opogode",
+    "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/294",
+    "credit": "Made with permission."
+  }
+}

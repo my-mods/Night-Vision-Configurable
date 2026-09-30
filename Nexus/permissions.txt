@@ -1,0 +1,7 @@
+Original code and documentation in Night Vision - Configurable are released under the MIT license. You may use, modify and redistribute that material while retaining its copyright and license notice.
+
+Night Vision by opogode (https://www.nexusmods.com/thebloodofdawnwalker/mods/294) is credited as the inspiration, made with permission. Its scripts and assets are not included, and this license grants no rights to the original mod.
+
+The bundled ue4ss-common modules retain their MIT notices. The unchanged Mod Setting Menu integration helper is included under the author's explicit integration instructions; see LICENSES/dmm-api.txt. That permission is not a blanket license to the Mod Setting Menu package.
+
+Game imagery and other third-party materials retain their original rights and are not covered by this mod's MIT license.

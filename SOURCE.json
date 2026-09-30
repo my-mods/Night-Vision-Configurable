@@ -5,7 +5,8 @@
     "author": "opogode",
     "version": "1.2",
     "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/294",
-    "redistributed": false
+    "redistributed": false,
+    "permission": "Made with permission from opogode."
   },
   "referenceGame": {
     "steamBuild": "25232147",

@@ -1,0 +1,47 @@
+[size=5][b][color=#E8C88A]Night Vision - Configurable[/color][/b][/size]
+
+See in the dark while keeping the world's natural colours, or blend toward black and white in [b]5% steps[/b]. Brightness is adjustable independently of colour.
+
+Inspired by [url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url], [b]made with permission[/b].
+
+[size=4][b][color=#E8C88A]Controls[/color][/b][/size]
+
+[list]
+[*][b][color=#A8D5C2]Keyboard:[/color][/b] Press N to toggle night vision in vampire form.
+[*][b][color=#A8D5C2]Controller:[/color][/b] Hold L3 / the left stick for 0.6 seconds. Release between toggles.
+[/list]
+
+Vision starts off. Loading a save, switching player or camera, or returning to human form turns it off. Activation includes a brief brightness pulse and uses the game's loaded focus sound when available.
+
+[size=4][b][color=#E8C88A]Configuration[/color][/b][/size]
+
+Open [b]Mod Settings > Night Vision - Configurable[/b]. Press Apply to save changes and adjust active vision immediately.
+
+[list]
+[*][b][color=#A8D5C2]Enabled:[/color][/b] Enables the shortcuts; it does not turn vision on automatically. Default: On.
+[*][b][color=#A8D5C2]Monochrome amount:[/color][/b] 0% keeps natural colours; 100% is black and white. Adjustable in 5% steps. Default: 0%.
+[*][b][color=#A8D5C2]Brightness:[/color][/b] Exposure compensation from -2 to 4 in 0.1 steps. Higher values brighten the image. Default: -0.5.
+[*][b][color=#A8D5C2]Controller shortcut:[/color][/b] Enables the left-stick hold. Keyboard N remains available. Default: On.
+[*][b][color=#A8D5C2]Logging:[/color][/b] Writes setup, activation and aggregate diagnostics to ue4ss/UE4SS.log. Default: Off.
+[/list]
+
+Without the menu, close the game, edit NightVisionConfigurable/settings.ini after it has been generated on first launch, and restart. The included settings.ini.example lists the defaults.
+
+The effect changes the current player camera and restores values still owned by the mod when it stops. It preserves the scene's colour tint and adds no chromatic aberration. The controller shortcut is blocked while paused, while the mouse cursor is visible, or while movement input is disabled.
+
+[size=4][b][color=#E8C88A]Installation[/color][/b][/size]
+
+[list]
+[*][b][color=#A8D5C2]Vortex:[/color][/b] Install Night-Vision-Configurable.zip through Vortex, enable it and deploy.
+[*][b][color=#A8D5C2]Manual:[/color][/b] Copy the archive's Data/NightVisionConfigurable folder into <The Blood of Dawnwalker>/Dawnwalker/Binaries/Win64/ue4ss/Mods, preserving the folder structure.
+[/list]
+
+[size=4][b][color=#E8C88A]Credits and source[/color][/b][/size]
+
+[url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url] — made with permission. This independent implementation does not redistribute the original mod's script or assets.
+
+Thanks to the UE4SS contributors and to mmarcussa for Mod Setting Menu and its integration helper. The bundled ue4ss-common settings modules are MIT licensed. Dependency notices are included in the archive.
+
+Banner and thumbnail: official in-game screenshot from the [url=https://rebel-wolves.com/en/press-center]Rebel Wolves press kit[/url], with a crop and title overlay. Illustrative promotional imagery.
+
+[url=https://github.com/my-mods/Night-Vision-Configurable]Source code and documentation[/url]. Authored code and documentation use the MIT license; third-party materials retain their respective rights. The Blood of Dawnwalker belongs to Rebel Wolves and its respective rights holders.
