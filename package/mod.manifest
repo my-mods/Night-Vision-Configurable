@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mod>
+  <info>
+    <name>Night Vision - Configurable</name>
+    <modid>NightVisionConfigurable</modid>
+    <description>Toggle vampire night vision with natural colours, an adjustable monochrome blend and configurable brightness.</description>
+    <author>oOCamilleOo</author>
+    <version>0.1.0</version>
+    <created_on>2026-09-30</created_on>
+  </info>
+  <supports>
+    <game>The Blood of Dawnwalker</game>
+    <requires>UE4SS with game-thread delayed actions, cancellation, native hooks and Lua 5.4</requires>
+    <optional>Dawnwalker Mod Menu 1.0.6 or later for live settings</optional>
+  </supports>
+</mod>

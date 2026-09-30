@@ -1,0 +1,4 @@
+.local/
+*.zip
+AGENTS.md
+agent-notes/

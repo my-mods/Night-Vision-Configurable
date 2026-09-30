@@ -1,0 +1,17 @@
+{
+  "implementation": "Independent Lua camera effect and lifecycle/input controller",
+  "inspiration": {
+    "name": "Night Vision",
+    "author": "opogode",
+    "version": "1.2",
+    "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/294",
+    "redistributed": false
+  },
+  "referenceGame": {
+    "steamBuild": "25232147",
+    "executableSha256": "cb9b7d7bd88a6754c0a9c08318aa64d5013ddfd92d5badcae84e1b4ea980dcfc",
+    "purpose": "Reference provenance only; never a runtime compatibility gate"
+  },
+  "commonModules": "ue4ss-common.lock.json",
+  "menuHelper": "DMM-API-SOURCE.json"
+}

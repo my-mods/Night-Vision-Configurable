@@ -1,0 +1,6 @@
+[Settings]
+enabled = 1
+monochrome = 0
+brightness = -0.5
+controllerInput = 1
+debugLogging = 0
