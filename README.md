@@ -2,7 +2,7 @@
 
 Toggle vampire night vision with **N** or by holding **L3 / the left stick for 0.6 seconds**. Release the stick between toggles. Vision starts off and resets after loading, possession changes, a camera change or a return to human form.
 
-Natural colours are the default. **Monochrome amount** runs from **0% natural colours** to **100% black and white**, with every intermediate percentage available. **Brightness** adjusts exposure independently, from -2 to 4, with -0.5 as the default. Activation includes a brief brightness pulse and uses the game's loaded focus sound when available.
+Natural colours are the default. **Monochrome amount** runs from **0% natural colours** to **100% black and white** in **5% steps**. **Brightness** adjusts exposure independently, from -2 to 4, with -0.5 as the default. Activation includes a brief brightness pulse and uses the game's loaded focus sound when available.
 
 The effect changes the current player camera only. It preserves the scene's colour tint and avoids adding chromatic aberration. Turning it off restores camera values still owned by the mod. Controller input is blocked while paused, while the mouse cursor is visible, or while movement input is disabled.
 

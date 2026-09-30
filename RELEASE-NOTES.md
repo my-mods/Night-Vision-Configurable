@@ -1,1 +1,1 @@
-Night Vision - Configurable adds vampire night vision with natural colours by default. Blend gradually to black and white, adjust brightness independently, and apply changes directly from Mod Settings. Toggle vision with N or by holding the left stick for 0.6 seconds.
+Night Vision - Configurable adds vampire night vision with natural colours by default. Blend to black and white in 5% steps, adjust brightness independently, and apply changes directly from Mod Settings. Toggle vision with N or by holding the left stick for 0.6 seconds.
