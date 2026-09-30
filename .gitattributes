@@ -1,6 +1,6 @@
 * text=auto eol=lf
 *.png binary
-src/SettingsStore.lua -text
+src/SettingsStore.lua -text whitespace=cr-at-eol
 src/UE4SSDawnwalkerSettings.lua -text
 src/dmm_api.lua -text
 LICENSES/ue4ss-common.txt -text
