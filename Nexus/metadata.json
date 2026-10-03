@@ -4,7 +4,7 @@
   "category": "Visuals",
   "author": "oOCamilleOo",
   "language": "English",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "source": "https://github.com/my-mods/Night-Vision-Configurable",
   "tags": ["Gameplay", "Quality of Life", "AI-Generated Content", "AI Media"],
   "summaryFile": "summary.txt",
@@ -13,7 +13,7 @@
   "file": {
     "name": "Night Vision - Configurable",
     "archive": "Night-Vision-Configurable.zip",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "main",
     "descriptionFile": "file-description.txt",
     "allowModManagerDownload": true,

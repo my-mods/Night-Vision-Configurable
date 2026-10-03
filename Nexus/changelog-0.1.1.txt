@@ -1,0 +1,3 @@
+Keeps vision enabled across camera changes, loading and player replacement until toggled off or confirmed human form.
+Recovers from camera-effect resets while preserving the latest underlying values for restoration.
+Temporary missing camera or player data no longer clears the night-vision toggle.

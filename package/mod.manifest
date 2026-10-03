@@ -5,7 +5,7 @@
     <modid>NightVisionConfigurable</modid>
     <description>Toggle vampire night vision with natural colours, an adjustable monochrome blend and configurable brightness.</description>
     <author>oOCamilleOo</author>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <created_on>2026-09-30</created_on>
   </info>
   <supports>
