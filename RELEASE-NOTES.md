@@ -1,5 +1,4 @@
 Night Vision - Configurable 0.1.1
 
-- Keeps vision enabled across camera changes, loading and player replacement until toggled off or confirmed human form.
-- Recovers from camera-effect resets while preserving the latest underlying values for restoration.
-- Temporary missing camera or player data no longer clears the night-vision toggle.
+- Night vision stays on until you turn it off or become human. Loading a save or camera changes no longer turn it off.
+- Fixed other visual effects interrupting night vision.
