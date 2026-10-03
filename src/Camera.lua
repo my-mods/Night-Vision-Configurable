@@ -59,15 +59,19 @@ function M.new(report)
                     -- A later external write owns the entire property/override pair.
                     local value,flag=read(pp,name),pp['bOverride_'..name]
                     local owned=equal(value,field.last.value) and flag==field.last.override
-                    if field.pending then
+                    if field.restoring then
+                        owned=partial(value,field.last.value,field.value)
+                            and (flag==field.last.override or flag==field.override)
+                    elseif field.pending then
                         owned=partial(value,field.last.value,field.pending.value)
                             and (flag==field.last.override or flag==field.pending.override)
                     end
                     if owned then
+                        field.restoring=true
                         write(pp,name,field.value)
                         pp['bOverride_'..name]=field.override
                     end
-                    field.last=nil;field.pending=nil
+                    field.last=nil;field.pending=nil;field.restoring=nil
                 end)
                 if not ok then failures[#failures+1]=name..': '..tostring(err) end
             end
@@ -95,8 +99,21 @@ function M.new(report)
     end
     function api.apply(settings, pulse)
         local h=assert(held,'No camera'); assert(sameCamera(h),'Camera replaced')
-        assert(not h.lastWeight or equal(h.camera.PostProcessBlendWeight,h.lastWeight),'Another effect changed camera blend weight')
         local pp=h.camera.PostProcessSettings
+        -- A game effect can replace these values without replacing the camera.
+        -- Adopt only externally changed values as the new restoration baseline.
+        local weight=h.camera.PostProcessBlendWeight
+        assert(finite(weight),'Missing camera blend weight')
+        if h.lastWeight and not equal(weight,h.lastWeight) then h.weight=weight end
+        for _,name in ipairs(names) do
+            local field=h.fields[name]
+            local value,flag=read(pp,name),pp['bOverride_'..name]
+            assert(type(flag)=='boolean','Missing override flag '..name)
+            if field.last then
+                if not equal(value,field.last.value) then field.value=value;field.override=flag end
+                if flag~=field.last.override then field.override=flag end
+            end
+        end
         local desired={AutoExposureBias=settings.brightness+(pulse or 0)*1.2,
             BloomIntensity=3+(pulse or 0)*2,BloomThreshold=0,VignetteIntensity=0.9}
         local original=h.fields.ColorSaturation
@@ -110,9 +127,6 @@ function M.new(report)
             local value=desired[name]
             local flag=true
             if not value then value=field.value; flag=field.override end
-            if field.last and (not equal(read(pp,name),field.last.value) or pp['bOverride_'..name]~=field.last.override) then
-                error('Another effect changed '..name..'; night vision stopped')
-            end
             -- Journal before attempting writes so a partial setter failure is recoverable.
             field.pending={value=read(pp,name),override=pp['bOverride_'..name]}
             field.last={value=value,override=flag}
@@ -124,6 +138,18 @@ function M.new(report)
         h.lastWeight=1
         if not equal(h.camera.PostProcessBlendWeight,1) then h.camera.PostProcessBlendWeight=1 end
         assert(equal(h.camera.PostProcessBlendWeight,1),'Blend weight write failed')
+    end
+    function api.refresh(settings)
+        local h=assert(held,'No camera');assert(sameCamera(h),'Camera replaced')
+        local pp=h.camera.PostProcessSettings
+        local changed=not equal(h.camera.PostProcessBlendWeight,h.lastWeight)
+        for _,name in ipairs(names) do
+            local field=h.fields[name]
+            if field.last and (not equal(read(pp,name),field.last.value)
+                or pp['bOverride_'..name]~=field.last.override) then changed=true end
+        end
+        if changed then api.apply(settings,0) end
+        return changed
     end
     return api
 end

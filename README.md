@@ -1,10 +1,10 @@
 # Night Vision - Configurable
 
-Toggle vampire night vision with **N** or by holding **L3 / the left stick for 0.6 seconds**. Release the stick between toggles. Vision starts off and resets after loading, possession changes, a camera change or a return to human form.
+Toggle vampire night vision with **N** or by holding **L3 / the left stick for 0.6 seconds**. Release the stick between toggles. Once enabled, vision stays on until you toggle it off or return to human form. Camera changes, save loading and player replacement preserve your choice and automatically resume the effect when a vampire player and camera are ready. A new game session starts with vision off.
 
 Natural colours are the default. **Monochrome amount** runs from **0% natural colours** to **100% black and white** in **5% steps**. **Brightness** adjusts exposure independently, from -2 to 4, with -0.5 as the default. Activation includes a brief brightness pulse and uses the game's loaded focus sound when available.
 
-The effect changes the current player camera only. It preserves the scene's colour tint and avoids adding chromatic aberration. Turning it off restores camera values still owned by the mod. Controller input is blocked while paused, while the mouse cursor is visible, or while movement input is disabled.
+The effect changes the current player camera only. It preserves the scene's colour tint and avoids adding chromatic aberration. If another game effect resets the camera settings, night vision restores its appearance and remembers those new values for when you turn it off. Controller input is blocked while paused, while the mouse cursor is visible, or while movement input is disabled; these restrictions do not turn active vision off.
 
 ## Dependencies
 
@@ -17,11 +17,11 @@ A Dawnwalker-compatible UE4SS installation providing Lua 5.4, game-thread delaye
 
 ## Configuration
 
-Open **Mod Settings > Night Vision - Configurable**. Apply saves changes and adjusts active vision immediately. Enabled controls whether the shortcuts are available; it does not automatically turn vision on. The controller shortcut can be disabled independently of keyboard N.
+Open **Mod Settings > Night Vision - Configurable**. Apply saves changes and adjusts active vision immediately. Enabled controls whether the mod is available; switching it Off also turns vision off. Enabling it again does not automatically activate vision. The controller shortcut can be disabled independently of keyboard N.
 
 Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on first launch, and restart the game. `settings.ini.example` documents the defaults. The archive does not include a personal settings file.
 
-**Logging** is the final setting and defaults to Off. When enabled, activation/readiness messages and aggregate input-check timings appear in `Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log` with the `[NightVisionConfigurable]` prefix. Distinct failures are reported once. The mod never polls configuration files or reapplies unchanged settings. The controller shortcut checks cached player input every 50 ms; keyboard-only active vision checks camera/form ownership every 250 ms and stops after deactivation.
+**Logging** is the final setting and defaults to Off. When enabled, activation/readiness messages, camera-repair counts and aggregate input-check timings appear in `Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log` with the `[NightVisionConfigurable]` prefix. Distinct failures are reported once. The mod never polls configuration files or writes unchanged camera settings. The controller shortcut checks cached player input every 50 ms. While vision is enabled, camera values are checked every 250 ms to recover from external resets; keyboard-only mode also checks camera/form ownership at that interval and stops after deactivation. Unsupported camera operations are suspended with bounded retries, retaining your toggle for a later camera or player change.
 
 ## Source and packaging
 

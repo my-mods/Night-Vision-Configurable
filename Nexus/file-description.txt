@@ -1,1 +1,3 @@
 Vampire night vision with natural colours by default, a 0–100% monochrome blend in 5% steps, independent brightness adjustment, N / hold L3 shortcuts and live Mod Settings controls. Made with permission from opogode, author of Night Vision.
+
+Stays enabled across camera changes and save loading until toggled off or returning to human form, and recovers from camera-effect resets.

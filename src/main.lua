@@ -19,12 +19,13 @@ local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetA
 local camera=require('Camera').new(report)
 local engine,gameplay,cameraClass,stickKey,vampireTag
 local scope,worker,timer,flashHandle
-local loading,armed,latched=false,false,false
+local loading,armed,latched,wanted=false,false,false,false
 local holdStart,generation=0,0
+local effectFailure,visualElapsed=nil,0
 local reloadSettings
 local hooks={}
-local stats={count=0,elapsed=0}
-local wake,poll,toggle
+local stats={count=0,elapsed=0,repairs=0}
+local wake,poll,toggle,syncVision
 
 local function cancel(handle) if handle then CancelDelayedAction(handle) end end
 local function endFlash() cancel(flashHandle);flashHandle=nil end
@@ -40,6 +41,7 @@ local function clear()
     if worker then cancel(worker.handle);worker=nil end
     restore()
     scope=nil;armed=false;latched=false;holdStart=0
+    effectFailure=nil;visualElapsed=0
 end
 local function current(s)
     if loading or not s or not valid(engine) or not valid(gameplay) then return false end
@@ -54,13 +56,56 @@ local function playable(s)
 end
 local function vampire(s)
     local asc=s.pawn.AbilitySystemComponent
-    return valid(asc) and asc:HasMatchingGameplayTag(vampireTag)==true
+    -- Missing/replacing ability data is not confirmation of human form.
+    if not valid(asc) then return nil end
+    local value=asc:HasMatchingGameplayTag(vampireTag)
+    if type(value)=='boolean' then return value end
 end
 local function activeTarget(s)
     local target=s.pc:GetViewTarget()
     if not valid(target) or not same(target:GetWorld(),s.world) then return nil end
     local c=target:GetComponentByClass(cameraClass)
     if valid(c) and c:IsActive() and same(c:GetOwner(),target) then return c end
+end
+syncVision=function(pulse,inspect,scopeChecked)
+    if not wanted or (not scopeChecked and not current(scope)) then return end
+    local token=generation
+    local form=vampire(scope)
+    if token~=generation then return end
+    if form==false then
+        wanted=false;effectFailure=nil
+        assert(restore(),'Camera restoration is incomplete')
+        trace('Vision off: human form confirmed.')
+        return
+    end
+    local target=activeTarget(scope)
+    if token~=generation then return end
+    if effectFailure and (same(target,effectFailure.target)
+        or (not valid(target) and not valid(effectFailure.target))) then
+        if effectFailure.attempts>=3 or not inspect then return end
+    else effectFailure=nil end
+    local ok,err=pcall(function()
+        if effectFailure then assert(restore(),'Camera restoration is incomplete') end
+        if form==nil or not same(target,camera.camera()) then
+            if camera.active() then assert(restore(),'Camera restoration is incomplete') end
+        end
+        if form~=true or not target then return end
+        if not camera.active() then
+            camera.capture(target)
+            camera.apply(settings,pulse or 0)
+            trace('Vision applied to the current camera.')
+        elseif pulse~=nil then camera.apply(settings,pulse)
+        elseif inspect then
+            local changed=camera.refresh(settings)
+            if changed and settings.debugLogging==1 then stats.repairs=stats.repairs+1 end
+        end
+    end)
+    if not ok then
+        local attempts=effectFailure and effectFailure.attempts or 0
+        effectFailure={target=target,attempts=attempts+1}
+        restore()
+        report('Camera effect suspended; toggle remains on: '..tostring(err))
+    else effectFailure=nil end
 end
 local function sound(s,on)
     -- Optional sound uses the location overload; no delegate marshalling.
@@ -94,10 +139,11 @@ local function flash()
         flashHandle=nil
         if token~=generation or not camera.active() then return end
         local ok,err=pcall(function()
-            if not current(scope) or not same(activeTarget(scope),camera.camera()) or not vampire(scope) then restore();return end
             step=step+1
-            camera.apply(settings,(1-step/18)^2)
-            if step<18 then flashHandle=ExecuteInGameThreadWithDelay(25,nextStep) end
+            syncVision((1-step/18)^2,true)
+            if token==generation and wanted and camera.active() and not effectFailure and step<18 then
+                flashHandle=ExecuteInGameThreadWithDelay(25,nextStep)
+            end
         end)
         if not ok then report('Activation pulse stopped: '..tostring(err));restore() end
     end
@@ -105,22 +151,29 @@ local function flash()
 end
 local function schedulePoll()
     if timer or loading or not scope or settings.enabled~=1 then return end
-    if settings.controllerInput~=1 and not camera.active() then return end
+    if settings.controllerInput~=1 and not wanted then return end
     -- A single one-shot is chained only while controller input or vision is active.
     timer=ExecuteInGameThreadWithDelay(settings.controllerInput==1 and 50 or 250,poll)
 end
 toggle=function()
-    if loading or settings.enabled~=1 then return end
+    if settings.enabled~=1 then return end
+    if wanted then
+        if current(scope) and not playable(scope) then armed=false;return end
+        wanted=false;effectFailure=nil
+        if restore() then
+            if current(scope) then pcall(sound,scope,false) end
+            trace('Vision off; owned camera values restored.')
+        end
+        return
+    end
+    if loading then return end
     if not current(scope) then clear();wake('keyboard');return end
     if not playable(scope) then armed=false;return end
-    if camera.active() then
-        if restore() then pcall(sound,scope,false);trace('Vision off; owned camera values restored.') end
-    elseif vampire(scope) then
-        local target=activeTarget(scope)
-        if not target then report('No active camera on the current player view target; vision unchanged.');return end
-        camera.capture(target)
-        camera.apply(settings,1)
-        flash()
+    if vampire(scope)==true then
+        wanted=true;visualElapsed=0
+        effectFailure=camera.active() and {target=camera.camera(),attempts=0} or nil
+        syncVision(1,true)
+        if camera.active() and not effectFailure then flash() end
         local ok,err=pcall(sound,scope,true)
         if not ok then report('Optional focus sound skipped: '..tostring(err)) end
         trace('Vision on.')
@@ -132,10 +185,12 @@ poll=function()
     local started=settings.debugLogging==1 and os.clock() or nil
     local ok,err=pcall(function()
         if not current(scope) then clear();wake('owner changed');return end
-        -- Observe dynamic ownership only. No config I/O, global scans or settings reapply.
-        if camera.active() and (not vampire(scope) or not same(activeTarget(scope),camera.camera())) then
-            assert(restore(),'Camera restoration is incomplete; waiting for a lifecycle event')
-        end
+        -- Observe changing form/camera state. Inspect external effect writes at most
+        -- every 250ms; unchanged settings and camera values are never reapplied.
+        visualElapsed=visualElapsed+(settings.controllerInput==1 and 50 or 250)
+        local inspect=visualElapsed>=250
+        if inspect then visualElapsed=0 end
+        syncVision(nil,inspect,true)
         if settings.controllerInput==1 then
             local down=scope.pc:IsInputKeyDown(stickKey)
             if not down then armed=true;latched=false;holdStart=0
@@ -150,8 +205,8 @@ poll=function()
     if started then
         stats.count=stats.count+1;stats.elapsed=stats.elapsed+(os.clock()-started)
         if stats.count>=600 then
-            trace(string.format('Input/vision checks: %d, total %.3f ms.',stats.count,stats.elapsed*1000))
-            stats.count,stats.elapsed=0,0
+            trace(string.format('Input/vision checks: %d, camera repairs: %d, total %.3f ms.',stats.count,stats.repairs,stats.elapsed*1000))
+            stats.count,stats.elapsed,stats.repairs=0,0,0
         end
     end
     if not ok then clear();report('Input/vision stopped until the next lifecycle event: '..tostring(err));return end
@@ -189,7 +244,10 @@ wake=function(reason)
         if not ok then worker=nil;report('Readiness stopped: '..tostring(ready));return end
         if ready then
             scope=ready;armed=false;latched=false;holdStart=0
-            worker=nil;schedulePoll()
+            worker=nil
+            local resumed,err=pcall(syncVision,nil,true)
+            if not resumed then clear();report('Vision recovery suspended: '..tostring(err));return end
+            schedulePoll()
             if settings.debugLogging==1 then trace('Player ready after '..job.attempts..' attempt(s): '..reason) end
         elseif job.attempts<20 then job.handle=ExecuteInGameThreadWithDelay(250,attempt)
         else worker=nil;report('Player not ready after 20 attempts; waiting for a lifecycle event or N.') end
@@ -207,12 +265,12 @@ local function apply(values)
     local inputChanged=settings.controllerInput~=values.controllerInput
     local visualChanged=settings.monochrome~=values.monochrome or settings.brightness~=values.brightness
     for k,v in pairs(values) do settings[k]=v end
-    stats.count,stats.elapsed=0,0
-    if settings.enabled~=1 then clear();return end
-    if camera.active() and visualChanged then
+    stats.count,stats.elapsed,stats.repairs=0,0,0
+    if settings.enabled~=1 then wanted=false;clear();return end
+    if wanted and visualChanged then
+        if effectFailure then effectFailure.attempts=0 end
         endFlash()
-        if current(scope) and same(activeTarget(scope),camera.camera()) then camera.apply(settings,0)
-        else restore() end
+        syncVision(0,true)
     end
     if enabledChanged then wake('settings') end
     if inputChanged then cancel(timer);timer=nil;armed=false;latched=false;holdStart=0;schedulePoll() end
@@ -235,7 +293,7 @@ ExecuteInGameThread(guarded(function()
         if not loading then reloadSettings();wake('save loaded') end
     end))
     for _,path in ipairs({'/Script/DogwoodUI.SaveWindowBase:RequestLoadSave','/Script/Persistency.SaveSystemBlueprintFunctionLibrary:LoadLastSave','/Script/Persistency.SaveSystemBlueprintFunctionLibrary:TryQuickload'}) do
-        hook(path,guarded(clear),function() end)
+        hook(path,guarded(clear),guarded(function() wake('load requested') end))
     end
     if type(RegisterLoadMapPreHook)=='function' then RegisterLoadMapPreHook(guarded(function() loading=true;clear() end)) end
     if type(RegisterLoadMapPostHook)=='function' then RegisterLoadMapPostHook(guarded(function() loading=false;reloadSettings();wake('map loaded') end)) end
