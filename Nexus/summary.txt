@@ -1,1 +1,1 @@
-Vampire night vision with natural colours, adjustable monochrome and brightness. Toggle with N or hold L3. Stays enabled through camera changes and save loading until toggled off or returning to human form.
+Vampire night vision with a neutral white-light radius or fullscreen mode, a red vignette with adjustable opacity, and separate Black & White and Red monochrome sliders. Toggle with N or hold L3; stays on through save loading.

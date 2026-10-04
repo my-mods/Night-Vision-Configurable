@@ -1,5 +1,10 @@
 {
-  "implementation": "Independent Lua camera effect and lifecycle/input controller",
+  "implementation": "Independent Lua camera effect, owned white point light, red UI vignette and lifecycle/input controller",
+  "vignetteMaterial": {
+    "path": "/Game/_Dawnwalker/UI/_Unified/SharedMaterials/M_UI_Vignette.M_UI_Vignette",
+    "owner": "Rebel Wolves",
+    "redistributed": false
+  },
   "inspiration": {
     "name": "Night Vision",
     "author": "opogode",

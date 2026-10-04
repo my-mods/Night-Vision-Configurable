@@ -1,6 +1,6 @@
 [size=5][b][color=#E8C88A]Night Vision - Configurable[/color][/b][/size]
 
-See in the dark while keeping the world's natural colours, or blend toward black and white in [b]5% steps[/b]. Brightness is adjustable independently of colour.
+See in the dark with a [b]neutral white-light radius[/b] around your character or the original [b]Fullscreen[/b] effect. Add a blood-red vignette and blend independently toward black-and-white or red monochrome in [b]5% steps[/b].
 
 Inspired by [url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url], [b]made with permission[/b].
 
@@ -13,7 +13,7 @@ Inspired by [url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night V
 
 [size=4][b][color=#E8C88A]Stays on until you turn it off[/color][/b][/size]
 
-Once enabled, vision stays on until you toggle it off or return to human form. Loading a save or switching player or camera preserves your choice and automatically resumes the effect when ready. A new game session starts with vision off. A brief brightness pulse marks activation.
+Once enabled, vision stays on until you toggle it off or return to human form. Loading a save or switching player or camera preserves your choice and automatically resumes the effect when ready. A new game session starts with vision off. A brief brightness pulse marks Fullscreen activation.
 
 [size=4][b][color=#E8C88A]Configuration[/color][/b][/size]
 
@@ -21,15 +21,19 @@ Open [b]Mod Settings > Night Vision - Configurable[/b]. Press Apply to save chan
 
 [list]
 [*][b][color=#A8D5C2]Enabled:[/color][/b] Enables the mod; switching it Off also turns vision off. Enabling it again does not activate vision automatically. Default: On.
-[*][b][color=#A8D5C2]Monochrome amount:[/color][/b] 0% keeps natural colours; 100% is black and white. Adjustable in 5% steps. Default: 0%.
-[*][b][color=#A8D5C2]Brightness:[/color][/b] Exposure compensation from -2 to 4 in 0.1 steps. Higher values brighten the image. Default: -0.5.
+[*][b][color=#A8D5C2]Night Vision Mode:[/color][/b] Radius lights a six-metre area around you without a yellow torch tint or a fullscreen exposure boost. Fullscreen brightens the whole view. Default: Fullscreen.
+[*][b][color=#A8D5C2]Vignette:[/color][/b] A soft blood-red screen-edge effect, independent of the game's damage effects. Default: On.
+[*][b][color=#A8D5C2]Vignette opacity:[/color][/b] 0–100% strength in 5% steps. Shown only with Vignette On. Default: 20%.
+[*][b][color=#A8D5C2]Black & White monochrome:[/color][/b] 0% keeps natural colours; 100% is black and white. Adjustable in 5% steps. Default: 0%.
+[*][b][color=#A8D5C2]Red monochrome:[/color][/b] Blend toward a fully red monochrome view in 5% steps. Can be combined with Black & White; the vignette stays red independently. Default: 0%.
+[*][b][color=#A8D5C2]Brightness:[/color][/b] Light strength in Radius mode or exposure in Fullscreen mode, from -2 to 4 in 0.1 steps. Default: -0.5.
 [*][b][color=#A8D5C2]Controller shortcut:[/color][/b] Enables the left-stick hold. Keyboard N remains available. Default: On.
 [*][b][color=#A8D5C2]Logging:[/color][/b] Writes setup, activation and aggregate diagnostics to ue4ss/UE4SS.log. Default: Off.
 [/list]
 
 Without the menu, close the game, edit NightVisionConfigurable/settings.ini after it has been generated on first launch, and restart. The included settings.ini.example lists the defaults.
 
-The effect follows the current player camera and recovers its appearance when another game effect resets the camera settings. Turning vision off restores the latest camera values still owned by the mod. It preserves the scene's colour tint and adds no chromatic aberration. The controller shortcut is blocked while paused, while the mouse cursor is visible, or while movement input is disabled; these restrictions do not turn active vision off.
+The light follows your character; colour effects follow the current camera. Turning vision off removes its light and overlay and restores the latest camera values still owned by the mod. Red monochrome at 0% preserves the scene's colour tint, and no chromatic aberration is added. The controller shortcut is blocked while paused, while the mouse cursor is visible, or while movement input is disabled; these restrictions do not turn active vision off.
 
 [size=4][b][color=#E8C88A]Installation[/color][/b][/size]
 

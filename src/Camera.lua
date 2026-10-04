@@ -1,7 +1,7 @@
 -- Camera-local post-processing. Only owned numeric snapshots survive a callback.
 local M = {}
-local components = {X=true,Y=true,Z=true,W=true}
-local names = {'AutoExposureBias','BloomIntensity','BloomThreshold','VignetteIntensity','ColorSaturation'}
+local vectors = {ColorSaturation={'X','Y','Z','W'},SceneColorTint={'R','G','B','A'}}
+local names = {'AutoExposureBias','BloomIntensity','BloomThreshold','ColorSaturation'}
 local function valid(o) return o ~= nil and o:IsValid() end
 local function finite(n) return type(n)=='number' and n==n and math.abs(n)<math.huge end
 local function equal(a,b)
@@ -14,12 +14,12 @@ local function equal(a,b)
     return a==b
 end
 local function read(pp,name)
-    if name~='ColorSaturation' then
+    if not vectors[name] then
         local v=pp[name]; assert(finite(v),'Missing/non-numeric '..name); return v
     end
     local out, field = {}, pp[name]
-    for k in pairs(components) do
-        local v=field[k]; assert(finite(v),'Missing saturation component '..k); out[k]=v
+    for _,k in ipairs(vectors[name]) do
+        local v=field[k]; assert(finite(v),'Missing '..name..' component '..k); out[k]=v
     end
     return out
 end
@@ -52,7 +52,7 @@ function M.new(report)
         if not sameCamera(h) then held=nil; return end
         local pp=h.camera.PostProcessSettings
         local failures={}
-        for _,name in ipairs(names) do
+        for _,name in ipairs(h.names) do
             local field=h.fields[name]
             if field.last then
                 local ok,err=pcall(function()
@@ -86,7 +86,7 @@ function M.new(report)
         assert(not held,'Previous camera still owned')
         assert(valid(camera) and camera:IsActive() and valid(camera:GetOwner()),'Inactive camera')
         local pp=camera.PostProcessSettings
-        local h={camera=camera,address=camera:GetAddress(),name=camera:GetFullName(),owner=camera:GetOwner(),fields={}}
+        local h={camera=camera,address=camera:GetAddress(),name=camera:GetFullName(),owner=camera:GetOwner(),fields={},names={}}
         h.weight=camera.PostProcessBlendWeight
         assert(finite(h.weight),'Missing camera blend weight')
         -- Validate every required field before writing any property.
@@ -94,7 +94,14 @@ function M.new(report)
             local flag=pp['bOverride_'..name]
             assert(type(flag)=='boolean','Missing override flag '..name)
             h.fields[name]={value=read(pp,name),override=flag}
+            h.names[#h.names+1]=name
         end
+        -- Red tint is optional; missing tint support must not disable brightness/B&W.
+        local ok,tint=pcall(function()
+            local flag=pp.bOverride_SceneColorTint;assert(type(flag)=='boolean')
+            return {value=read(pp,'SceneColorTint'),override=flag}
+        end)
+        if ok then h.fields.SceneColorTint=tint;h.names[#h.names+1]='SceneColorTint' end
         held=h
     end
     function api.apply(settings, pulse)
@@ -105,7 +112,7 @@ function M.new(report)
         local weight=h.camera.PostProcessBlendWeight
         assert(finite(weight),'Missing camera blend weight')
         if h.lastWeight and not equal(weight,h.lastWeight) then h.weight=weight end
-        for _,name in ipairs(names) do
+        for _,name in ipairs(h.names) do
             local field=h.fields[name]
             local value,flag=read(pp,name),pp['bOverride_'..name]
             assert(type(flag)=='boolean','Missing override flag '..name)
@@ -114,15 +121,29 @@ function M.new(report)
                 if flag~=field.last.override then field.override=flag end
             end
         end
-        local desired={AutoExposureBias=settings.brightness+(pulse or 0)*1.2,
-            BloomIntensity=3+(pulse or 0)*2,BloomThreshold=0,VignetteIntensity=0.9}
+        -- Radius illumination belongs to an attached light, never global exposure.
+        local desired={}
+        if settings.nightVisionMode==1 then
+            desired.AutoExposureBias=settings.brightness+(pulse or 0)*1.2
+            desired.BloomIntensity=3+(pulse or 0)*2;desired.BloomThreshold=0
+        end
         local original=h.fields.ColorSaturation
-        local fraction=settings.monochrome/100
+        local red=settings.redMonochrome/100
+        if red>0 and not h.fields.SceneColorTint then
+            red=0
+            report('Red monochrome unavailable: camera colour tint is unsupported; brightness and Black & White remain enabled.')
+        end
+        local fraction=1-(1-settings.monochrome/100)*(1-red)
         if fraction>0 then
             local base=original.override and original.value or {X=1,Y=1,Z=1,W=1}
             desired.ColorSaturation={X=base.X*(1-fraction),Y=base.Y*(1-fraction),Z=base.Z*(1-fraction),W=base.W}
         end
-        for _,name in ipairs(names) do
+        if red>0 then
+            local tint=h.fields.SceneColorTint
+            local base=tint.override and tint.value or {R=1,G=1,B=1,A=1}
+            desired.SceneColorTint={R=base.R,G=base.G*(1-red),B=base.B*(1-red),A=base.A}
+        end
+        for _,name in ipairs(h.names) do
             local field=h.fields[name]
             local value=desired[name]
             local flag=true
@@ -135,15 +156,16 @@ function M.new(report)
             assert(equal(read(pp,name),value) and pp['bOverride_'..name]==flag,'Write verification failed: '..name)
             field.pending=nil
         end
-        h.lastWeight=1
-        if not equal(h.camera.PostProcessBlendWeight,1) then h.camera.PostProcessBlendWeight=1 end
-        assert(equal(h.camera.PostProcessBlendWeight,1),'Blend weight write failed')
+        local blend=(settings.nightVisionMode==1 or fraction>0) and 1 or h.weight
+        h.lastWeight=blend
+        if not equal(h.camera.PostProcessBlendWeight,blend) then h.camera.PostProcessBlendWeight=blend end
+        assert(equal(h.camera.PostProcessBlendWeight,blend),'Blend weight write failed')
     end
     function api.refresh(settings)
         local h=assert(held,'No camera');assert(sameCamera(h),'Camera replaced')
         local pp=h.camera.PostProcessSettings
         local changed=not equal(h.camera.PostProcessBlendWeight,h.lastWeight)
-        for _,name in ipairs(names) do
+        for _,name in ipairs(h.names) do
             local field=h.fields[name]
             if field.last and (not equal(read(pp,name),field.last.value)
                 or pp['bOverride_'..name]~=field.last.override) then changed=true end

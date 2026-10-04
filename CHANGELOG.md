@@ -1,5 +1,11 @@
 # Changelog
 
+## In development
+
+- Choose neutral white lighting around your character or the original fullscreen night vision.
+- Toggle a blood-red screen-edge vignette and adjust its opacity.
+- Blend independently toward black-and-white or red monochrome in 5% steps.
+
 ## 0.1.1
 
 - Night vision stays on until you turn it off or become human. Loading a save or camera changes no longer turn it off.

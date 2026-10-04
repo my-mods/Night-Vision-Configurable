@@ -1,6 +1,7 @@
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
-local settings={enabled=1,monochrome=0,brightness=-0.5,controllerInput=1,debugLogging=0}
+local settings={enabled=1,nightVisionMode=1,vignette=1,vignetteOpacity=20,
+    monochrome=0,redMonochrome=0,brightness=-0.5,controllerInput=1,debugLogging=0}
 local warnings={}
 local warningCount=0
 local function report(message)
@@ -17,6 +18,7 @@ end
 local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
 local camera=require('Camera').new(report)
+local appearance=require('Appearance').new(report)
 local engine,gameplay,cameraClass,stickKey,vampireTag
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
@@ -29,11 +31,15 @@ local wake,poll,toggle,syncVision
 
 local function cancel(handle) if handle then CancelDelayedAction(handle) end end
 local function endFlash() cancel(flashHandle);flashHandle=nil end
-local function restore()
+local function restoreCamera()
     endFlash()
     local ok,err=pcall(camera.release)
     if not ok then report(tostring(err));return false end
     return true
+end
+local function restore()
+    local extras=appearance.release()
+    return restoreCamera() and extras
 end
 local function clear()
     generation=generation+1
@@ -80,14 +86,16 @@ syncVision=function(pulse,inspect,scopeChecked)
     end
     local target=activeTarget(scope)
     if token~=generation then return end
+    if form==true and target then appearance.sync(scope,settings,inspect)
+    else appearance.release() end
     if effectFailure and (same(target,effectFailure.target)
         or (not valid(target) and not valid(effectFailure.target))) then
         if effectFailure.attempts>=3 or not inspect then return end
     else effectFailure=nil end
     local ok,err=pcall(function()
-        if effectFailure then assert(restore(),'Camera restoration is incomplete') end
+        if effectFailure then assert(restoreCamera(),'Camera restoration is incomplete') end
         if form==nil or not same(target,camera.camera()) then
-            if camera.active() then assert(restore(),'Camera restoration is incomplete') end
+            if camera.active() then assert(restoreCamera(),'Camera restoration is incomplete') end
         end
         if form~=true or not target then return end
         if not camera.active() then
@@ -103,7 +111,7 @@ syncVision=function(pulse,inspect,scopeChecked)
     if not ok then
         local attempts=effectFailure and effectFailure.attempts or 0
         effectFailure={target=target,attempts=attempts+1}
-        restore()
+        restoreCamera()
         report('Camera effect suspended; toggle remains on: '..tostring(err))
     else effectFailure=nil end
 end
@@ -173,10 +181,14 @@ toggle=function()
         wanted=true;visualElapsed=0
         effectFailure=camera.active() and {target=camera.camera(),attempts=0} or nil
         syncVision(1,true)
-        if camera.active() and not effectFailure then flash() end
+        if settings.nightVisionMode==1 and camera.active() and not effectFailure then flash() end
         local ok,err=pcall(sound,scope,true)
         if not ok then report('Optional focus sound skipped: '..tostring(err)) end
-        trace('Vision on.')
+        if settings.debugLogging==1 then
+            trace(string.format('Vision on: mode=%s, vignette=%d/%d%%, B&W=%d%%, red=%d%%.',
+                settings.nightVisionMode==0 and 'Radius' or 'Fullscreen',settings.vignette,
+                settings.vignetteOpacity,settings.monochrome,settings.redMonochrome))
+        end
     else trace('Activation requires vampire form.') end
     schedulePoll()
 end
@@ -264,6 +276,8 @@ local function apply(values)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
     local visualChanged=settings.monochrome~=values.monochrome or settings.brightness~=values.brightness
+        or settings.nightVisionMode~=values.nightVisionMode or settings.vignette~=values.vignette
+        or settings.vignetteOpacity~=values.vignetteOpacity or settings.redMonochrome~=values.redMonochrome
     for k,v in pairs(values) do settings[k]=v end
     stats.count,stats.elapsed,stats.repairs=0,0,0
     if settings.enabled~=1 then wanted=false;clear();return end
@@ -271,6 +285,7 @@ local function apply(values)
         if effectFailure then effectFailure.attempts=0 end
         endFlash()
         syncVision(0,true)
+        if settings.debugLogging==1 then trace('Appearance settings applied.') end
     end
     if enabledChanged then wake('settings') end
     if inputChanged then cancel(timer);timer=nil;armed=false;latched=false;holdStart=0;schedulePoll() end

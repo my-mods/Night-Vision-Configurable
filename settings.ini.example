@@ -1,6 +1,11 @@
 [Settings]
 enabled = 1
+; 0 = Radius (neutral white, six metres), 1 = Fullscreen
+nightVisionMode = 1
+vignette = 1
+vignetteOpacity = 20
 monochrome = 0
+redMonochrome = 0
 brightness = -0.5
 controllerInput = 1
 debugLogging = 0

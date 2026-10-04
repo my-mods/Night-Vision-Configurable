@@ -2,9 +2,13 @@
 
 Toggle vampire night vision with **N** or by holding **L3 / the left stick for 0.6 seconds**. Release the stick between toggles. Once enabled, vision stays on until you toggle it off or return to human form. Camera changes, save loading and player replacement preserve your choice and automatically resume the effect when a vampire player and camera are ready. A new game session starts with vision off.
 
-Natural colours are the default. **Monochrome amount** runs from **0% natural colours** to **100% black and white** in **5% steps**. **Brightness** adjusts exposure independently, from -2 to 4, with -0.5 as the default. Activation includes a brief brightness pulse and uses the game's loaded focus sound when available.
+Choose **Night Vision Mode: Radius / Fullscreen**. Radius adds a neutral white light with a six-metre falloff around your character, without a yellow torch tint or a fullscreen exposure boost. Fullscreen retains the original whole-view effect and remains the default. **Brightness** adjusts the radius light's strength or fullscreen exposure, from -2 to 4, with -0.5 as the default. Fullscreen activation includes a brief brightness pulse; either mode uses the game's loaded focus sound when available.
 
-The effect changes the current player camera only. It preserves the scene's colour tint and avoids adding chromatic aberration. If another game effect resets the camera settings, night vision restores its appearance and remembers those new values for when you turn it off. Controller input is blocked while paused, while the mouse cursor is visible, or while movement input is disabled; these restrictions do not turn active vision off.
+**Vignette** adds a soft blood-red effect around the screen edges. It defaults to On at **20% opacity**; its **0–100% opacity slider** is visible only while Vignette is On. Off or 0% removes the overlay. This is independent of the game's damage effects.
+
+**Black & White monochrome** blends from natural colours at **0%** to black and white at **100%**. **Red monochrome** blends toward a fully red monochrome view at **100%**. Both default to **0%**, use **5% steps**, and work in either mode. They can be combined: Black & White removes colour, while Red also adds a red tint. The vignette stays red independently of these sliders.
+
+Turning vision off removes its light and overlay and restores camera values still owned by the mod. With Red monochrome at 0%, the original scene tint is preserved. No chromatic aberration is added. If another game effect resets the camera settings, night vision restores its appearance and remembers those new values for when you turn it off. Controller input is blocked while paused, while the mouse cursor is visible, or while movement input is disabled; these restrictions do not turn active vision off.
 
 ## Dependencies
 
@@ -19,9 +23,9 @@ A Dawnwalker-compatible UE4SS installation providing Lua 5.4, game-thread delaye
 
 Open **Mod Settings > Night Vision - Configurable**. Apply saves changes and adjusts active vision immediately. Enabled controls whether the mod is available; switching it Off also turns vision off. Enabling it again does not automatically activate vision. The controller shortcut can be disabled independently of keyboard N.
 
-Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on first launch, and restart the game. `settings.ini.example` documents the defaults. The archive does not include a personal settings file.
+Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on first launch, and restart the game. `settings.ini.example` documents the defaults. The archive does not include a personal settings file. Existing brightness and monochrome preferences remain in use; new keys take their defaults until saved through Apply.
 
-**Logging** is the final setting and defaults to Off. When enabled, activation/readiness messages, camera-repair counts and aggregate input-check timings appear in `Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log` with the `[NightVisionConfigurable]` prefix. Distinct failures are reported once. The mod never polls configuration files or writes unchanged camera settings. The controller shortcut checks cached player input every 50 ms. While vision is enabled, camera values are checked every 250 ms to recover from external resets; keyboard-only mode also checks camera/form ownership at that interval and stops after deactivation. Unsupported camera operations are suspended with bounded retries, retaining your toggle for a later camera or player change.
+**Logging** is the final setting and defaults to Off. When enabled, activation/readiness messages, selected appearance values, camera-repair counts and aggregate input/vision-check timings appear in `Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log` with the `[NightVisionConfigurable]` prefix. Distinct failures are reported once. The mod never polls configuration files or writes unchanged camera settings. The controller shortcut checks cached player input every 50 ms. While vision is enabled, camera values and owned effect validity are checked every 250 ms; keyboard-only mode also checks camera/form ownership at that interval and stops after deactivation. The light follows its attachment without scripted movement updates. Unsupported operations are suspended separately with bounded retries, preserving other available effects.
 
 ## Source and packaging
 
