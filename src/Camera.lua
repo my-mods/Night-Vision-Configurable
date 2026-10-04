@@ -7,6 +7,11 @@ local function finite(n) return type(n)=='number' and n==n and math.abs(n)<math.
 local function equal(a,b)
     if type(a)=='table' then
         if type(b)~='table' then return false end
+        if a.isObject then
+            if not b.isObject then return false end
+            local av,bv=valid(a.reference),valid(b.reference)
+            return (not av and not bv) or (av and bv and a.reference:GetAddress()==b.reference:GetAddress())
+        end
         for k,v in pairs(a) do if not equal(v,b[k]) then return false end end
         return true
     end
@@ -14,6 +19,7 @@ local function equal(a,b)
     return a==b
 end
 local function read(pp,name)
+    if name=='ColorGradingLUT' then return {isObject=true,reference=pp[name]} end
     if not vectors[name] then
         local v=pp[name]; assert(finite(v),'Missing/non-numeric '..name); return v
     end
@@ -24,20 +30,24 @@ local function read(pp,name)
     return out
 end
 local function write(pp,name,value)
-    if type(value)=='table' then
+    if name=='ColorGradingLUT' then
+        if not equal(read(pp,name),value) then pp[name]=value.reference end
+    elseif type(value)=='table' then
         local field=pp[name]
         for k,v in pairs(value) do if not equal(field[k],v) then field[k]=v end end
     elseif not equal(pp[name],value) then pp[name]=value end
 end
 local function partial(value,target,before)
+    if type(target)=='table' and target.isObject then return equal(value,target) or equal(value,before) end
     if type(target)=='table' then
         for k,v in pairs(target) do if not partial(value[k],v,before[k]) then return false end end
         return true
     end
     return equal(value,target) or equal(value,before)
 end
-function M.new(report)
+function M.new(report,directory)
     local held
+    local bloodTexture=require('BloodColour').new(directory)
     local api = {}
     local function sameCamera(h)
         return valid(h.camera) and h.camera:GetAddress()==h.address
@@ -107,6 +117,31 @@ function M.new(report)
     function api.apply(settings, pulse)
         local h=assert(held,'No camera'); assert(sameCamera(h),'Camera replaced')
         local pp=h.camera.PostProcessSettings
+        local keepRed=settings.keepBloodRed==1 and settings.monochrome>0
+        if not keepRed then h.lutAttempted=nil end
+        if keepRed and not h.lutAttempted then
+            h.lutAttempted=true
+            local ok,value=pcall(function()
+                if not h.fields.ColorGradingLUT then
+                    local fields={}
+                    for _,name in ipairs({'ColorGradingLUT','ColorGradingIntensity'}) do
+                        local flag=pp['bOverride_'..name]
+                        assert(type(flag)=='boolean','Missing override flag '..name)
+                        fields[name]={value=read(pp,name),override=flag}
+                    end
+                    for _,name in ipairs({'ColorGradingLUT','ColorGradingIntensity'}) do
+                        h.fields[name]=fields[name];h.names[#h.names+1]=name
+                    end
+                end
+                -- A Lua wrapper does not keep an Unreal texture alive. Do not
+                -- displace another effect's LUT and risk losing its only owner.
+                assert(not valid(h.fields.ColorGradingLUT.value.reference),'The camera already uses another colour lookup texture')
+                return bloodTexture(h.owner)
+            end)
+            if ok then h.lut=value
+            else h.lut=nil;report('Keep blood red unavailable; regular Black & White remains active: '..tostring(value)) end
+        end
+        keepRed=keepRed and valid(h.lut)
         -- A game effect can replace these values without replacing the camera.
         -- Adopt only externally changed values as the new restoration baseline.
         local weight=h.camera.PostProcessBlendWeight
@@ -121,6 +156,10 @@ function M.new(report)
                 if flag~=field.last.override then field.override=flag end
             end
         end
+        if keepRed and valid(h.fields.ColorGradingLUT.value.reference) then
+            keepRed=false
+            report('Keep blood red suspended: another camera colour lookup texture takes priority; regular Black & White remains active.')
+        end
         -- Brightness scales scene colour without replacing the game's exposure/bloom.
         -- Radius illumination and its red colour belong to the attached light only.
         local desired={}
@@ -132,7 +171,11 @@ function M.new(report)
             red=0;brightness=1
             report('Fullscreen brightness/red tint unavailable: camera colour tint is unsupported; Radius and Black & White remain enabled.')
         end
-        local fraction=1-(1-settings.monochrome/100)*(1-red)
+        local fraction=keepRed and 0 or 1-(1-settings.monochrome/100)*(1-red)
+        if keepRed then
+            desired.ColorGradingLUT={isObject=true,reference=h.lut}
+            desired.ColorGradingIntensity=settings.monochrome/100
+        end
         if fraction>0 then
             local base=original.override and original.value or {X=1,Y=1,Z=1,W=1}
             desired.ColorSaturation={X=base.X*(1-fraction),Y=base.Y*(1-fraction),Z=base.Z*(1-fraction),W=base.W}
@@ -155,7 +198,7 @@ function M.new(report)
             assert(equal(read(pp,name),value) and pp['bOverride_'..name]==flag,'Write verification failed: '..name)
             field.pending=nil
         end
-        local blend=(brightness~=1 or fraction>0) and 1 or h.weight
+        local blend=(brightness~=1 or fraction>0 or keepRed) and 1 or h.weight
         h.lastWeight=blend
         if not equal(h.camera.PostProcessBlendWeight,blend) then h.camera.PostProcessBlendWeight=blend end
         assert(equal(h.camera.PostProcessBlendWeight,blend),'Blend weight write failed')

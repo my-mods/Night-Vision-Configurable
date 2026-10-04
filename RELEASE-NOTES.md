@@ -1,5 +1,6 @@
 Night Vision - Configurable 0.1.1 — development build
 
+- Added Keep blood red for Black & White with HDR off. Other red objects and the vampire border stay coloured too.
 - Fixed the settings page failing to open after an upgrade.
 - Choose Radius or Fullscreen; set the radius from 5–50 metres in 1-metre steps.
 - Adjust brightness from 25–300% in 5% steps. Older settings are converted automatically.

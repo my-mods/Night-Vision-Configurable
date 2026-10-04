@@ -7,6 +7,7 @@ M.schema = {
     {key='vignette',values={0,1},default=1},
     {key='vignetteOpacity',min=0,max=100,integer=true,default=20},
     {key='monochrome',min=0,max=100,integer=true,default=0},
+    {key='keepBloodRed',values={0,1},default=0},
     {key='redMonochrome',min=0,max=100,integer=true,default=0},
     {key='brightnessPercent',min=25,max=300,integer=true,default=200},
     {key='controllerInput',values={0,1},default=1},

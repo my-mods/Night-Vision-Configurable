@@ -1,7 +1,7 @@
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
 local settings={enabled=1,nightVisionMode=1,radiusMeters=6,vignette=1,vignetteOpacity=20,
-    monochrome=0,redMonochrome=0,brightnessPercent=200,controllerInput=1,debugLogging=0}
+    monochrome=0,keepBloodRed=0,redMonochrome=0,brightnessPercent=200,controllerInput=1,debugLogging=0}
 local warnings={}
 local warningCount=0
 local function report(message)
@@ -17,7 +17,7 @@ for _,name in ipairs({'ExecuteInGameThread','ExecuteInGameThreadWithDelay','Canc
 end
 local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
-local camera=require('Camera').new(report)
+local camera=require('Camera').new(report,directory)
 local appearance=require('Appearance').new(report)
 local engine,gameplay,cameraClass,stickKey,vampireTag,uiManager
 local scope,worker,timer,flashHandle
@@ -197,9 +197,9 @@ toggle=function()
         local ok,err=pcall(sound,scope,true)
         if not ok then report('Optional focus sound skipped: '..tostring(err)) end
         if settings.debugLogging==1 then
-            trace(string.format('Vision on: mode=%s, vignette=%d/%d%%, B&W=%d%%, red=%d%%.',
+            trace(string.format('Vision on: mode=%s, vignette=%d/%d%%, B&W=%d%%, red=%d%%, keep blood red=%d.',
                 settings.nightVisionMode==0 and 'Radius' or 'Fullscreen',settings.vignette,
-                settings.vignetteOpacity,settings.monochrome,settings.redMonochrome))
+                settings.vignetteOpacity,settings.monochrome,settings.redMonochrome,settings.keepBloodRed))
         end
     else trace('Activation requires vampire form.') end
     schedulePoll()
@@ -289,6 +289,7 @@ local function apply(values)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
     local visualChanged=settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
+        or settings.keepBloodRed~=values.keepBloodRed
         or settings.radiusMeters~=values.radiusMeters
         or settings.nightVisionMode~=values.nightVisionMode or settings.vignette~=values.vignette
         or settings.vignetteOpacity~=values.vignetteOpacity or settings.redMonochrome~=values.redMonochrome

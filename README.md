@@ -10,6 +10,8 @@ Choose **Night Vision Mode: Radius / Fullscreen**. Radius lights the area around
 
 **Black & White** removes colour from the world: **0%** keeps natural colours; **100%** is black and white. **Red tint** colours only the added light in Radius mode, so unlit areas keep their colours. In Fullscreen mode, it colours the whole view. Both use **0–100%**, in **5% steps**, default **0%**. The vignette stays red independently.
 
+**Keep blood red** is an optional toggle under Black & White, default **Off**. On preserves red shades while the slider removes other colours, so blood and the vampire vignette can stay red together. It also preserves similarly red clothing and objects. Dark or discoloured blood may lose some colour, and lighting still affects the result. Use it with **HDR output off**. With HDR enabled, an unavailable filter or another camera colour filter taking priority, ordinary Black & White remains active and the vignette stays red.
+
 Menus temporarily hide the light, border and camera effects; returning to gameplay restores them without another toggle. Pausing, showing the mouse cursor, blocking movement or hiding gameplay UI also suspends the effects and shortcuts. Turning vision off removes its light and border and restores camera values still owned by the mod. No chromatic aberration is added. Changes made by other game effects are preserved when night vision ends.
 
 ## Dependencies
@@ -31,7 +33,7 @@ Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on firs
 
 ## Source and packaging
 
-The Lua sources are in `src`. To assemble a package, copy those files into `Data/NightVisionConfigurable/Scripts`, and put `package/enabled.txt` and `package/mod_settings.ini` in `Data/NightVisionConfigurable`. Put `package/mod.manifest` at archive root, alongside a UTF-8 `README.txt` made from this README and the license files. The pinned common modules and unchanged menu helper are already bundled; no compiler or separate common-library installation is required.
+The Lua sources are in `src`. To assemble a package, copy those files into `Data/NightVisionConfigurable/Scripts`, copy both PNG files from `assets` into `Data/NightVisionConfigurable/Textures`, and put `package/enabled.txt` and `package/mod_settings.ini` in `Data/NightVisionConfigurable`. Put `package/mod.manifest` at archive root, alongside a UTF-8 `README.txt` made from this README and the license files. The pinned common modules and unchanged menu helper are already bundled; no compiler or separate common-library installation is required.
 
 Keep the `Nexus` release materials, changelog, release notes and provenance files at archive root, outside `Data`.
 
