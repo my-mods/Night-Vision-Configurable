@@ -2,6 +2,7 @@
 
 ## In development
 
+- Fixed the settings page showing “config key missing or ambiguous” after upgrading from an earlier version.
 - Choose neutral white lighting around your character or the original fullscreen night vision.
 - Toggle a blood-red screen-edge vignette and adjust its opacity.
 - Blend independently toward black-and-white or red monochrome in 5% steps.
