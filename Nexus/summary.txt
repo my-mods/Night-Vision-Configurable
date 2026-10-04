@@ -1,1 +1,1 @@
-Vampire night vision with a neutral white-light radius or fullscreen mode, a red vignette with adjustable opacity, and separate Black & White and Red monochrome sliders. Toggle with N or hold L3; stays on through save loading.
+Vampire night vision with a 5–50 metre white-light radius or fullscreen brightness, a thin red side border hidden in menus, and optional colour effects. Toggle with N or hold L3; stays enabled through save loading.

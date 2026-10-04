@@ -1,5 +1,5 @@
 {
-  "implementation": "Independent Lua camera effect, owned white point light, red UI vignette and lifecycle/input controller",
+  "implementation": "Independent Lua brightness/colour effect, owned white-to-red radius light, thin UI side border and lifecycle/input controller",
   "vignetteMaterial": {
     "path": "/Game/_Dawnwalker/UI/_Unified/SharedMaterials/M_UI_Vignette.M_UI_Vignette",
     "owner": "Rebel Wolves",

@@ -17,20 +17,35 @@ function M.complete(original,schema)
         lines[#lines+1]=full
     end
     text=table.concat(lines):sub(1,-2) -- Remove only the synthetic final newline.
-    local present,section={},''
+    local present,legacy,section={},{},''
     for line in (text..'\n'):gmatch('(.-)\r?\n') do
         line=line:gsub('[;#].*$',''):match('^%s*(.-)%s*$')
         local header=line:match('^%[([^%]]+)%]$')
         if header then section=header
         elseif section=='Settings' then
-            local key=line:match('^([%w_]+)%s*=')
-            if key then present[key]=true end
+            local key,value=line:match('^([%w_]+)%s*=%s*(.-)%s*$')
+            if key then
+                present[key]=(present[key] or 0)+1
+                legacy[key]=tonumber(value)
+            end
         end
     end
     local added={}
+    local migratedBrightness
+    if not present.brightnessPercent and present.brightness then
+        if present.brightness~=1 or not legacy.brightness or legacy.brightness~=legacy.brightness
+            or legacy.brightness < -2 or legacy.brightness > 4 then
+            return nil,'Invalid or duplicate legacy brightness'
+        end
+        -- Retain the old assignment as a record. The new key takes precedence.
+        -- Radius preserves its former light strength; fullscreen converts EV to %.
+        local offset=legacy.nightVisionMode==0 and 0.5 or 0
+        migratedBrightness=math.max(25,math.min(300,5*math.floor(20*2^(legacy.brightness+offset)+0.5)))
+    end
     for _,field in ipairs(schema) do
         if not present[field.key] then
-            added[#added+1]=field.key..' = '..string.format('%.17g',field.default)
+            local value=field.key=='brightnessPercent' and migratedBrightness or field.default
+            added[#added+1]=field.key..' = '..string.format('%.17g',value)
         end
     end
     if #added>0 then

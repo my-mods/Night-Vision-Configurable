@@ -17,11 +17,13 @@ local function signature(path,expected)
     assert(index==#expected,'Incomplete signature: '..path)
 end
 function M.new(report)
-    local light,host,image,mid,owner,controller
+    local light,host,owner,controller
+    local images,mids={},{}
+    local hidden=false
     local lightReady=false
     local lightAttempted,overlayAttempted=false,false
     local lightCleanup,overlayCleanup=0,0
-    local mode,brightness,vignette,opacity
+    local mode,brightness,radius,red,vignette,opacity
     local api={}
     local function releaseLight()
         if valid(light) then
@@ -41,7 +43,7 @@ function M.new(report)
             overlayCleanup=overlayCleanup+1
             host:RemoveFromParent()
         end
-        host=nil;image=nil;mid=nil
+        host=nil;images={};mids={}
         overlayCleanup=0
     end
     local function safe(label,fn)
@@ -53,10 +55,24 @@ function M.new(report)
         local a=safe('Radius cleanup',releaseLight)
         local b=safe('Vignette cleanup',releaseOverlay)
         if a and b then
-            owner=nil;controller=nil;mode=nil;brightness=nil;vignette=nil;opacity=nil
+            owner=nil;controller=nil;mode=nil;brightness=nil;radius=nil;red=nil;vignette=nil;opacity=nil
+            hidden=false
             lightAttempted=false;overlayAttempted=false
         end
         return a and b
+    end
+    function api.hide()
+        if hidden then return end
+        local a=safe('Radius hiding',function() if valid(light) then light:SetVisibility(false,false) end end)
+        local b=safe('Vignette hiding',function() if valid(host) then host:SetVisibility(1) end end)
+        if not a then safe('Radius cleanup',releaseLight) end
+        if not b then safe('Vignette cleanup',releaseOverlay) end
+        hidden=true
+    end
+    local function updateLight()
+        light:SetIntensity(6.75*brightness/100)
+        light:SetAttenuationRadius(radius*100) -- Unreal centimetres.
+        light:SetLightColor({R=1,G=1-red/100,B=1-red/100,A=1},false)
     end
     local function makeLight()
         -- Validate the creation/cleanup contract before creating a component.
@@ -71,16 +87,14 @@ function M.new(report)
         assert(same(light:GetOwner(),owner),'Radius owner changed')
         light:SetVisibility(false,false)
         light:SetMobility(2) -- Movable; attachment follows the pawn without Lua updates.
-        light:SetLightColor({R=1,G=1,B=1,A=1},false)
         light:SetUseTemperature(false)
         light:SetUseInverseSquaredFalloff(false)
         light:SetLightFalloffExponent(8)
-        light:SetAttenuationRadius(600)
         -- No self-shadow from the body enclosing the light, fog glow or indirect spill.
         light:SetCastShadows(false)
         light:SetIndirectLightingIntensity(0)
         light:SetVolumetricScatteringIntensity(0)
-        light:SetIntensity(6.75*2^(brightness+0.5))
+        updateLight()
         owner:FinishAddComponent(light,false,transform)
         light:SetVisibility(true,false)
         lightReady=true
@@ -104,17 +118,28 @@ function M.new(report)
         host.bAutoActivate=false;host.bIsModal=false
         host.bSupportsActivationFocus=false;host.bAutoRestoreFocus=false
         local tree=need(host.WidgetTree,'vignette WidgetTree')
-        image=need(StaticConstructObject(object('/Script/UMG.Image'),tree),'vignette image')
-        tree.RootWidget=image
-        image:SetBrushFromMaterial(material)
-        mid=need(image:GetDynamicMaterial(),'vignette material instance')
-        local colorName,intensityName=FName('Color'),FName('Intensity')
-        mid:SetVectorParameterValue(colorName,{R=0.55,G=0.002,B=0.008,A=1})
-        mid:SetScalarParameterValue(intensityName,1)
-        local color=mid:K2_GetVectorParameterValue(colorName)
-        assert(type(color.R)=='number' and math.abs(color.R-0.55)<1e-4,'Vignette colour parameter missing')
-        assert(math.abs(mid:K2_GetScalarParameterValue(intensityName)-1)<1e-4,'Vignette intensity parameter missing')
-        image:SetRenderOpacity(opacity/100)
+        local canvas=need(StaticConstructObject(object('/Script/UMG.CanvasPanel'),tree),'vignette canvas')
+        tree.RootWidget=canvas
+        canvas:SetClipping(1)
+        local imageClass=object('/Script/UMG.Image')
+        -- Geometry restricts the effect to 3% at each side, at any aspect ratio.
+        -- The centre cannot be tinted regardless of the stock material's ramp.
+        for _,edges in ipairs({{0,0.03},{0.97,1}}) do
+            local image=need(StaticConstructObject(imageClass,tree),'vignette image')
+            local slot=need(canvas:AddChildToCanvas(image),'vignette slot')
+            slot:SetAnchors({Minimum={X=edges[1],Y=0},Maximum={X=edges[2],Y=1}})
+            slot:SetOffsets({Left=0,Top=0,Right=0,Bottom=0})
+            image:SetBrushFromMaterial(material)
+            local mid=need(image:GetDynamicMaterial(),'vignette material instance')
+            images[#images+1]=image;mids[#mids+1]=mid
+            local colorName,intensityName=FName('Color'),FName('Intensity')
+            mid:SetVectorParameterValue(colorName,{R=0.55,G=0.002,B=0.008,A=1})
+            mid:SetScalarParameterValue(intensityName,1)
+            local color=mid:K2_GetVectorParameterValue(colorName)
+            assert(type(color.R)=='number' and math.abs(color.R-0.55)<1e-4,'Vignette colour parameter missing')
+            assert(math.abs(mid:K2_GetScalarParameterValue(intensityName)-1)<1e-4,'Vignette intensity parameter missing')
+            image:SetRenderOpacity(opacity/100)
+        end
         host:SetVisibility(3) -- HitTestInvisible: neither the host nor children intercept input.
         host:AddToViewport(-10)
     end
@@ -123,15 +148,17 @@ function M.new(report)
             if not api.release() then return end
             owner=scope.pawn;controller=scope.pc
         end
-        local lightChanged=mode~=settings.nightVisionMode or brightness~=settings.brightness
+        local lightChanged=mode~=settings.nightVisionMode or brightness~=settings.brightnessPercent
+            or radius~=settings.radiusMeters or red~=settings.redMonochrome
         local overlayChanged=vignette~=settings.vignette or opacity~=settings.vignetteOpacity
-        mode=settings.nightVisionMode;brightness=settings.brightness
+        mode=settings.nightVisionMode;brightness=settings.brightnessPercent
+        radius=settings.radiusMeters;red=settings.redMonochrome
         vignette=settings.vignette;opacity=settings.vignetteOpacity
         if lightChanged then lightAttempted=false;lightCleanup=0 end
         if overlayChanged then overlayAttempted=false;overlayCleanup=0 end
         if inspect then
             if light and not valid(light) then light=nil;lightAttempted=false end
-            if host and not valid(host) then host=nil;image=nil;mid=nil;overlayAttempted=false end
+            if host and not valid(host) then host=nil;images={};mids={};overlayAttempted=false end
         end
         if mode~=0 then
             if light then safe('Radius cleanup',releaseLight) end
@@ -139,7 +166,7 @@ function M.new(report)
             lightAttempted=true
             local ok=safe('Radius unavailable; Fullscreen remains selectable',function()
                 if valid(light) and lightReady then
-                    light:SetIntensity(6.75*2^(brightness+0.5));light:SetVisibility(true,false)
+                    updateLight();light:SetVisibility(true,false)
                 else assert(releaseLight()~=false,'Radius cleanup incomplete');makeLight() end
             end)
             if not ok then safe('Radius cleanup',releaseLight) end
@@ -149,10 +176,17 @@ function M.new(report)
         elseif not overlayAttempted then
             overlayAttempted=true
             local ok=safe('Red vignette unavailable; other vision effects remain enabled',function()
-                if valid(host) and valid(image) and valid(mid) then image:SetRenderOpacity(opacity/100)
+                if valid(host) and #images==2 and valid(images[1]) and valid(images[2])
+                    and valid(mids[1]) and valid(mids[2]) then
+                    for _,image in ipairs(images) do image:SetRenderOpacity(opacity/100) end
                 else assert(releaseOverlay()~=false,'Vignette cleanup incomplete');makeOverlay() end
             end)
             if not ok then safe('Vignette cleanup',releaseOverlay) end
+        end
+        if hidden then
+            safe('Radius resume',function() if valid(light) and lightReady and mode==0 then light:SetVisibility(true,false) end end)
+            safe('Vignette resume',function() if valid(host) and vignette==1 and opacity>0 then host:SetVisibility(3) end end)
+            hidden=false
         end
     end
     return api

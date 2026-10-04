@@ -1,7 +1,7 @@
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
-local settings={enabled=1,nightVisionMode=1,vignette=1,vignetteOpacity=20,
-    monochrome=0,redMonochrome=0,brightness=-0.5,controllerInput=1,debugLogging=0}
+local settings={enabled=1,nightVisionMode=1,radiusMeters=6,vignette=1,vignetteOpacity=20,
+    monochrome=0,redMonochrome=0,brightnessPercent=200,controllerInput=1,debugLogging=0}
 local warnings={}
 local warningCount=0
 local function report(message)
@@ -19,7 +19,7 @@ local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
 local camera=require('Camera').new(report)
 local appearance=require('Appearance').new(report)
-local engine,gameplay,cameraClass,stickKey,vampireTag
+local engine,gameplay,cameraClass,stickKey,vampireTag,uiManager
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
 local holdStart,generation=0,0
@@ -46,7 +46,7 @@ local function clear()
     cancel(timer);timer=nil
     if worker then cancel(worker.handle);worker=nil end
     restore()
-    scope=nil;armed=false;latched=false;holdStart=0
+    scope=nil;uiManager=nil;armed=false;latched=false;holdStart=0
     effectFailure=nil;visualElapsed=0
 end
 local function current(s)
@@ -57,8 +57,14 @@ local function current(s)
         and same(s.pc.Pawn,s.pawn) and same(s.pawn:GetWorld(),s.world)
 end
 local function playable(s)
-    return not gameplay:IsGamePaused(s.world) and s.pc.bShowMouseCursor~=true
-        and not s.pc:IsMoveInputIgnored()
+    if gameplay:IsGamePaused(s.world) or s.pc.bShowMouseCursor==true
+        or s.pc:IsMoveInputIgnored() then return false end
+    if valid(uiManager) and same(uiManager:GetWorld(),s.world) then
+        local ok,visible=pcall(function() return uiManager:ShouldShowGameplayWidgets() end)
+        if ok and visible==false then return false end
+        if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; input/menu guards remain active.') end
+    end
+    return true
 end
 local function vampire(s)
     local asc=s.pawn.AbilitySystemComponent
@@ -82,6 +88,12 @@ syncVision=function(pulse,inspect,scopeChecked)
         wanted=false;effectFailure=nil
         assert(restore(),'Camera restoration is incomplete')
         trace('Vision off: human form confirmed.')
+        return
+    end
+    -- Preserve the toggle while menus/cutscenes hide every owned visual effect.
+    if not playable(scope) then
+        appearance.hide()
+        assert(restoreCamera(),'Camera restoration is incomplete')
         return
     end
     local target=activeTarget(scope)
@@ -231,6 +243,7 @@ local function discover(job)
         if not valid(engine) then engine=FindFirstOf('Engine') end
         if not valid(gameplay) then gameplay=StaticFindObject('/Script/Engine.Default__GameplayStatics') end
         if not valid(cameraClass) then cameraClass=StaticFindObject('/Script/Engine.CameraComponent') end
+        if not valid(uiManager) then uiManager=FindFirstOf('UIManagerSubsystem') end
     end
     if not valid(engine) or not valid(gameplay) or not valid(cameraClass) then return end
     local viewport=engine.GameViewport
@@ -275,7 +288,8 @@ end
 local function apply(values)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
-    local visualChanged=settings.monochrome~=values.monochrome or settings.brightness~=values.brightness
+    local visualChanged=settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
+        or settings.radiusMeters~=values.radiusMeters
         or settings.nightVisionMode~=values.nightVisionMode or settings.vignette~=values.vignette
         or settings.vignetteOpacity~=values.vignetteOpacity or settings.redMonochrome~=values.redMonochrome
     for k,v in pairs(values) do settings[k]=v end
@@ -300,6 +314,13 @@ ExecuteInGameThread(guarded(function()
     vampireTag={TagName=FName('Player.IsVampire')}
     reloadSettings=require('Settings').start(directory,guarded(apply),report)
     hook('/Script/Engine.PlayerController:ClientRestart',guarded(clear),guarded(function() wake('client restart') end))
+    -- This native UI event covers controller menus without relying on a mouse cursor.
+    hook('/Script/DogwoodUI.UIManagerSubsystem:SetShowGameplayWidgets',function() end,guarded(function(context)
+        local manager=context:get()
+        if current(scope) and valid(manager) and same(manager:GetWorld(),scope.world) then
+            uiManager=manager;syncVision(nil,true)
+        end
+    end))
     local lastLoading
     hook('/Script/DogwoodCombat.CombatSubsystem:OnLoadingScreenStateChanged',function() end,guarded(function(_,state)
         local value=type(state)=='number' and state or state:get()

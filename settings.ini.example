@@ -1,11 +1,15 @@
 [Settings]
 enabled = 1
-; 0 = Radius (neutral white, six metres), 1 = Fullscreen
+; 0 = Radius, 1 = Fullscreen
 nightVisionMode = 1
+; Radius only: 5 to 50 metres, in 1-metre steps
+radiusMeters = 6
 vignette = 1
 vignetteOpacity = 20
 monochrome = 0
+; Red tint colours the light in Radius mode, the view in Fullscreen mode
 redMonochrome = 0
-brightness = -0.5
+; 25 to 300%, in 5% steps. 100% = normal view / standard radius light
+brightnessPercent = 200
 controllerInput = 1
 debugLogging = 0

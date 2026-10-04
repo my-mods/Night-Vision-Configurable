@@ -2,10 +2,12 @@
 
 ## In development
 
-- Fixed the settings page showing “config key missing or ambiguous” after upgrading from an earlier version.
-- Choose neutral white lighting around your character or the original fullscreen night vision.
-- Toggle a blood-red screen-edge vignette and adjust its opacity.
-- Blend independently toward black-and-white or red monochrome in 5% steps.
+- Fixed the settings page showing “config key missing or ambiguous” after an upgrade.
+- Choose Radius or Fullscreen night vision, with a 5–50 metre light radius in 1-metre steps.
+- Adjust brightness from 25–300% in 5% steps, with automatic conversion of older settings.
+- Red tint now colours only the added light in Radius mode.
+- Replaced the broad vignette with a thin side border and hide vision effects in menus.
+- Added separate Black & White, Red tint and border opacity sliders in 5% steps, with clearer descriptions.
 
 ## 0.1.1
 

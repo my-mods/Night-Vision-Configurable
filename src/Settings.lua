@@ -3,11 +3,12 @@ local Upgrade = require('SettingsUpgrade')
 M.schema = {
     {key='enabled',values={0,1},default=1},
     {key='nightVisionMode',values={0,1},default=1},
+    {key='radiusMeters',min=5,max=50,integer=true,default=6},
     {key='vignette',values={0,1},default=1},
     {key='vignetteOpacity',min=0,max=100,integer=true,default=20},
     {key='monochrome',min=0,max=100,integer=true,default=0},
     {key='redMonochrome',min=0,max=100,integer=true,default=0},
-    {key='brightness',min=-2,max=4,default=-0.5},
+    {key='brightnessPercent',min=25,max=300,integer=true,default=200},
     {key='controllerInput',values={0,1},default=1},
     {key='debugLogging',values={0,1},default=0},
 }

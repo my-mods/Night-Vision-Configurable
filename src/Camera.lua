@@ -96,7 +96,7 @@ function M.new(report)
             h.fields[name]={value=read(pp,name),override=flag}
             h.names[#h.names+1]=name
         end
-        -- Red tint is optional; missing tint support must not disable brightness/B&W.
+        -- Missing tint support must not disable Radius illumination or B&W.
         local ok,tint=pcall(function()
             local flag=pp.bOverride_SceneColorTint;assert(type(flag)=='boolean')
             return {value=read(pp,'SceneColorTint'),override=flag}
@@ -121,27 +121,26 @@ function M.new(report)
                 if flag~=field.last.override then field.override=flag end
             end
         end
-        -- Radius illumination belongs to an attached light, never global exposure.
+        -- Brightness scales scene colour without replacing the game's exposure/bloom.
+        -- Radius illumination and its red colour belong to the attached light only.
         local desired={}
-        if settings.nightVisionMode==1 then
-            desired.AutoExposureBias=settings.brightness+(pulse or 0)*1.2
-            desired.BloomIntensity=3+(pulse or 0)*2;desired.BloomThreshold=0
-        end
+        local fullscreen=settings.nightVisionMode==1
+        local brightness=fullscreen and (settings.brightnessPercent/100)*2^((pulse or 0)*1.2) or 1
         local original=h.fields.ColorSaturation
-        local red=settings.redMonochrome/100
-        if red>0 and not h.fields.SceneColorTint then
-            red=0
-            report('Red monochrome unavailable: camera colour tint is unsupported; brightness and Black & White remain enabled.')
+        local red=fullscreen and settings.redMonochrome/100 or 0
+        if (red>0 or brightness~=1) and not h.fields.SceneColorTint then
+            red=0;brightness=1
+            report('Fullscreen brightness/red tint unavailable: camera colour tint is unsupported; Radius and Black & White remain enabled.')
         end
         local fraction=1-(1-settings.monochrome/100)*(1-red)
         if fraction>0 then
             local base=original.override and original.value or {X=1,Y=1,Z=1,W=1}
             desired.ColorSaturation={X=base.X*(1-fraction),Y=base.Y*(1-fraction),Z=base.Z*(1-fraction),W=base.W}
         end
-        if red>0 then
+        if red>0 or brightness~=1 then
             local tint=h.fields.SceneColorTint
             local base=tint.override and tint.value or {R=1,G=1,B=1,A=1}
-            desired.SceneColorTint={R=base.R,G=base.G*(1-red),B=base.B*(1-red),A=base.A}
+            desired.SceneColorTint={R=base.R*brightness,G=base.G*(1-red)*brightness,B=base.B*(1-red)*brightness,A=base.A}
         end
         for _,name in ipairs(h.names) do
             local field=h.fields[name]
@@ -156,7 +155,7 @@ function M.new(report)
             assert(equal(read(pp,name),value) and pp['bOverride_'..name]==flag,'Write verification failed: '..name)
             field.pending=nil
         end
-        local blend=(settings.nightVisionMode==1 or fraction>0) and 1 or h.weight
+        local blend=(brightness~=1 or fraction>0) and 1 or h.weight
         h.lastWeight=blend
         if not equal(h.camera.PostProcessBlendWeight,blend) then h.camera.PostProcessBlendWeight=blend end
         assert(equal(h.camera.PostProcessBlendWeight,blend),'Blend weight write failed')
