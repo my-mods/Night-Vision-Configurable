@@ -4,7 +4,8 @@ local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
 local function need(o,label) assert(valid(o),'Unavailable '..label);return o end
 local transform={Rotation={X=0,Y=0,Z=0,W=1},Translation={X=30,Y=0,Z=45},Scale3D={X=1,Y=1,Z=1}}
-local materialPath='/Game/_Dawnwalker/UI/_Unified/SharedMaterials/M_UI_Vignette.M_UI_Vignette'
+-- Reuse the game's vampire veins and alpha fade, independently of hunger/health.
+local texturePath='/Game/_Dawnwalker/Player/VampireHunger/Material/Textures/T_BloodHunger_Stretched.T_BloodHunger_Stretched'
 local function object(path) return need(StaticFindObject(path),path) end
 local function signature(path,expected)
     local fn=object(path);local index=0
@@ -17,8 +18,7 @@ local function signature(path,expected)
     assert(index==#expected,'Incomplete signature: '..path)
 end
 function M.new(report)
-    local light,host,owner,controller
-    local images,mids={},{}
+    local light,host,image,owner,controller
     local hidden=false
     local lightReady=false
     local lightAttempted,overlayAttempted=false,false
@@ -43,7 +43,7 @@ function M.new(report)
             overlayCleanup=overlayCleanup+1
             host:RemoveFromParent()
         end
-        host=nil;images={};mids={}
+        host=nil;image=nil
         overlayCleanup=0
     end
     local function safe(label,fn)
@@ -101,16 +101,19 @@ function M.new(report)
     end
     local function makeOverlay()
         assert(type(StaticConstructObject)=='function','StaticConstructObject missing')
-        local material=StaticFindObject(materialPath)
-        if not valid(material) and type(LoadAsset)=='function' then
-            material=LoadAsset(materialPath)
-            if not valid(material) then material=StaticFindObject(materialPath) end
+        signature('/Script/UMG.Image:SetBrushFromTexture',{{'Texture','ObjectProperty'},{'bMatchSize','BoolProperty'}})
+        signature('/Script/UMG.Image:SetColorAndOpacity',{{'InColorAndOpacity','StructProperty'}})
+        local texture=StaticFindObject(texturePath)
+        if not valid(texture) and type(LoadAsset)=='function' then
+            texture=LoadAsset(texturePath)
+            if not valid(texture) then texture=StaticFindObject(texturePath) end
         end
-        if not valid(material) then
+        if not valid(texture) then
             local loader=object('/Script/Engine.Default__KismetSystemLibrary')
-            material=loader:LoadAsset_Blocking(loader:Conv_SoftObjPathToSoftObjRef(loader:MakeSoftObjectPath(materialPath)))
+            texture=loader:LoadAsset_Blocking(loader:Conv_SoftObjPathToSoftObjRef(loader:MakeSoftObjectPath(texturePath)))
         end
-        need(material,'red vignette material')
+        need(texture,'vampire vignette texture')
+        assert(texture:IsA(object('/Script/Engine.Texture2D')),'Unsupported vampire vignette texture')
         local library=object('/Script/UMG.Default__WidgetBlueprintLibrary')
         host=need(library:Create(controller,object('/Script/CommonUI.CommonActivatableWidget'),controller),'vignette host')
         -- This visual-only widget never activates, registers Back, or takes focus.
@@ -121,25 +124,15 @@ function M.new(report)
         local canvas=need(StaticConstructObject(object('/Script/UMG.CanvasPanel'),tree),'vignette canvas')
         tree.RootWidget=canvas
         canvas:SetClipping(1)
-        local imageClass=object('/Script/UMG.Image')
-        -- Geometry restricts the effect to 3% at each side, at any aspect ratio.
-        -- The centre cannot be tinted regardless of the stock material's ramp.
-        for _,edges in ipairs({{0,0.03},{0.97,1}}) do
-            local image=need(StaticConstructObject(imageClass,tree),'vignette image')
-            local slot=need(canvas:AddChildToCanvas(image),'vignette slot')
-            slot:SetAnchors({Minimum={X=edges[1],Y=0},Maximum={X=edges[2],Y=1}})
-            slot:SetOffsets({Left=0,Top=0,Right=0,Bottom=0})
-            image:SetBrushFromMaterial(material)
-            local mid=need(image:GetDynamicMaterial(),'vignette material instance')
-            images[#images+1]=image;mids[#mids+1]=mid
-            local colorName,intensityName=FName('Color'),FName('Intensity')
-            mid:SetVectorParameterValue(colorName,{R=0.55,G=0.002,B=0.008,A=1})
-            mid:SetScalarParameterValue(intensityName,1)
-            local color=mid:K2_GetVectorParameterValue(colorName)
-            assert(type(color.R)=='number' and math.abs(color.R-0.55)<1e-4,'Vignette colour parameter missing')
-            assert(math.abs(mid:K2_GetScalarParameterValue(intensityName)-1)<1e-4,'Vignette intensity parameter missing')
-            image:SetRenderOpacity(opacity/100)
-        end
+        image=need(StaticConstructObject(object('/Script/UMG.Image'),tree),'vignette image')
+        local slot=need(canvas:AddChildToCanvas(image),'vignette slot')
+        -- One continuous alpha mask, enlarged around its clear upper centre.
+        -- All four quad edges stay outside the viewport: no interior clip seam.
+        slot:SetAnchors({Minimum={X=-0.15,Y=-0.2},Maximum={X=1.15,Y=1.8}})
+        slot:SetOffsets({Left=0,Top=0,Right=0,Bottom=0})
+        image:SetBrushFromTexture(texture,false)
+        image:SetColorAndOpacity({R=1,G=0.08,B=0.12,A=1})
+        image:SetRenderOpacity(opacity/100)
         host:SetVisibility(3) -- HitTestInvisible: neither the host nor children intercept input.
         host:AddToViewport(-10)
     end
@@ -158,7 +151,8 @@ function M.new(report)
         if overlayChanged then overlayAttempted=false;overlayCleanup=0 end
         if inspect then
             if light and not valid(light) then light=nil;lightAttempted=false end
-            if host and not valid(host) then host=nil;images={};mids={};overlayAttempted=false end
+            if host and not valid(host) then host=nil;image=nil;overlayAttempted=false end
+            if image and not valid(image) then overlayAttempted=false end
         end
         if mode~=0 then
             if light then safe('Radius cleanup',releaseLight) end
@@ -176,9 +170,8 @@ function M.new(report)
         elseif not overlayAttempted then
             overlayAttempted=true
             local ok=safe('Red vignette unavailable; other vision effects remain enabled',function()
-                if valid(host) and #images==2 and valid(images[1]) and valid(images[2])
-                    and valid(mids[1]) and valid(mids[2]) then
-                    for _,image in ipairs(images) do image:SetRenderOpacity(opacity/100) end
+                if valid(host) and valid(image) then
+                    image:SetRenderOpacity(opacity/100)
                 else assert(releaseOverlay()~=false,'Vignette cleanup incomplete');makeOverlay() end
             end)
             if not ok then safe('Vignette cleanup',releaseOverlay) end

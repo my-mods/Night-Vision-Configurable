@@ -6,7 +6,7 @@
 - Choose Radius or Fullscreen night vision, with a 5–50 metre light radius in 1-metre steps.
 - Adjust brightness from 25–300% in 5% steps, with automatic conversion of older settings.
 - Red tint now colours only the added light in Radius mode.
-- Replaced the broad vignette with a thin side border and hide vision effects in menus.
+- Replaced the rectangular red bands with the game's softly fading vampire veins; vision effects remain hidden in menus.
 - Added separate Black & White, Red tint and border opacity sliders in 5% steps, with clearer descriptions.
 
 ## 0.1.1

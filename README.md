@@ -6,9 +6,9 @@ Choose **Night Vision Mode: Radius / Fullscreen**. Radius lights the area around
 
 **Brightness** runs from **25% to 300%**, in **5% steps**, default **200%**. In Fullscreen mode, 100% keeps normal game brightness; higher values brighten the view without forcing extra bloom or changing exposure. In Radius mode, 100% is the light's standard strength. The game's lighting and display settings still affect the result. Fullscreen activation includes a brief brightness pulse; either mode uses the game's loaded focus sound when available.
 
-**Vignette** adds a thin blood-red border at the left and right edges, leaving the middle clear. It defaults to On at **20% opacity**. Its **0–100% slider**, in **5% steps**, appears only when On. Off or 0% removes the border. It is independent of the game's damage effects.
+**Vignette** reuses the game's vampire blood-hunger texture: irregular red veins fade softly inward from the edges. It uses its own overlay and does not trigger hunger or low-health effects. It defaults to On at **20% opacity**. Its **0–100% slider**, in **5% steps**, appears only when On. Off or 0% removes the border. It is independent of the game's damage effects.
 
-**Black & White** removes colour from the world: **0%** keeps natural colours; **100%** is black and white. **Red tint** colours only the added light in Radius mode, so unlit areas keep their colours. In Fullscreen mode, it colours the whole view. Both use **0–100%**, in **5% steps**, default **0%**. The border stays red independently.
+**Black & White** removes colour from the world: **0%** keeps natural colours; **100%** is black and white. **Red tint** colours only the added light in Radius mode, so unlit areas keep their colours. In Fullscreen mode, it colours the whole view. Both use **0–100%**, in **5% steps**, default **0%**. The vignette stays red independently.
 
 Menus temporarily hide the light, border and camera effects; returning to gameplay restores them without another toggle. Pausing, showing the mouse cursor, blocking movement or hiding gameplay UI also suspends the effects and shortcuts. Turning vision off removes its light and border and restores camera values still owned by the mod. No chromatic aberration is added. Changes made by other game effects are preserved when night vision ends.
 

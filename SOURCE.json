@@ -1,10 +1,5 @@
 {
-  "implementation": "Independent Lua brightness/colour effect, owned white-to-red radius light, thin UI side border and lifecycle/input controller",
-  "vignetteMaterial": {
-    "path": "/Game/_Dawnwalker/UI/_Unified/SharedMaterials/M_UI_Vignette.M_UI_Vignette",
-    "owner": "Rebel Wolves",
-    "redistributed": false
-  },
+  "implementation": "Independent Lua brightness/colour effect, owned white-to-red radius light, soft vampire-texture overlay and lifecycle/input controller",
   "inspiration": {
     "name": "Night Vision",
     "author": "opogode",
@@ -19,5 +14,11 @@
     "purpose": "Reference provenance only; never a runtime compatibility gate"
   },
   "commonModules": "ue4ss-common.lock.json",
-  "menuHelper": "DMM-API-SOURCE.json"
+  "menuHelper": "DMM-API-SOURCE.json",
+  "vignetteTexture": {
+    "path": "/Game/_Dawnwalker/Player/VampireHunger/Material/Textures/T_BloodHunger_Stretched.T_BloodHunger_Stretched",
+    "owner": "Rebel Wolves",
+    "redistributed": false,
+    "usage": "Runtime reference to the stock texture only; independent of health/hunger material parameter collections."
+  }
 }
