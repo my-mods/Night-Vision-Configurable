@@ -4,6 +4,8 @@ Toggle vampire night vision with **N** or by holding **L3 / the left stick for 0
 
 Choose **Night Vision Mode: Radius / Fullscreen**. Radius lights the area around your character like a white torch. Its **Light radius** slider appears only in Radius mode: **5–50 metres**, in **1-metre steps**, default **6 metres**. Fullscreen brightens the whole view and remains the default.
 
+The current development archive also includes an optional **Natural preview**. With ordinary night vision off, press **F8** during vampire gameplay to brighten a broad oval around the camera aim while preserving the normal night image at the edges. The preview uses 200% brightness, 90% size and 70% softness, with no activation flash. F8 turns it off; it also ends after 60 seconds, on menus/loading, becoming human, pressing N or applying settings. Use SDR output. The settings menu still offers Radius and Fullscreen.
+
 **Brightness** runs from **25% to 300%**, in **5% steps**, default **200%**. In Fullscreen mode, 100% keeps normal game brightness; higher values brighten the view without forcing extra bloom or changing exposure. In Radius mode, 100% is the light's standard strength. The game's lighting and display settings still affect the result. Fullscreen activation includes a brief brightness pulse; either mode uses the game's loaded focus sound when available.
 
 **Vignette** reuses the game's vampire blood-hunger texture: irregular red veins fade softly inward from the edges. It uses its own overlay and does not trigger hunger or low-health effects. It defaults to On at **20% opacity**. Its **0–100% slider**, in **5% steps**, appears only when On. Off or 0% removes the border. It is independent of the game's damage effects.
@@ -23,7 +25,7 @@ Requires [UE4SS for Dawnwalker by Vercadi](https://www.nexusmods.com/thebloodofd
 ## Installation
 
 - Vortex: Install `Night-Vision-Configurable.zip` through Vortex, enable it and deploy.
-- Manual: Copy the archive's `Data/NightVisionConfigurable` folder into `<The Blood of Dawnwalker>/Dawnwalker/Binaries/Win64/ue4ss/Mods`, preserving the folder structure.
+- Manual: Copy the archive's `Dawnwalker` folder into The Blood of Dawnwalker's game folder, preserving the folder structure.
 
 ## Configuration
 
@@ -35,11 +37,11 @@ Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on firs
 
 ## Source and packaging
 
-The Lua sources are in `src`. To assemble a package, copy those files into `Data/NightVisionConfigurable/Scripts`, copy all PNG files from `assets` into `Data/NightVisionConfigurable/Textures`, and put `package/enabled.txt` and `package/mod_settings.ini` in `Data/NightVisionConfigurable`. Put `package/mod.manifest` at archive root, alongside a UTF-8 `README.txt` made from this README and the license files. The pinned common modules and unchanged menu helper are already bundled; no compiler or separate common-library installation is required.
+The Lua sources are in `src`. For the current development package, copy those files into `Dawnwalker/Binaries/Win64/ue4ss/Mods/NightVisionConfigurable/Scripts`, replacing `main.lua` with `preview/main.lua`. Copy all PNG files from `assets` into that mod's `Textures` folder, and put `package/enabled.txt` and `package/mod_settings.ini` at the mod root. The pinned common modules and unchanged menu helper are already bundled.
 
-The separate [Natural prototype](Unreal/README.md) has original Unreal 5.5.4 material/Blueprint assets and an optional F8 preview entry point in `preview`. It is not enabled by the normal entry point or menu.
+The [Natural prototype](Unreal/README.md) supplies the original Unreal 5.5.4 material/Blueprint assets and cooking details. Put its cooked container in `Dawnwalker/Content/Paks/~mods`. The existing `src/main.lua` remains the two-mode entry point; the development archive uses `preview/main.lua` to add the F8 test without adding a menu mode.
 
-Keep the `Nexus` release materials, changelog, release notes and provenance files at archive root, outside `Data`.
+Put `package/mod.manifest`, `preview/README.txt`, `preview/vortex_override_instructions.json` and the license files at archive root. Copy `preview/NightVisionConfigurable-Layout.txt` into `Data`; it is a layout note, not runtime payload. Keep the `Nexus` release materials, changelog, release notes and provenance files at archive root, outside the `Dawnwalker` runtime folder.
 
 ## Credits
 
