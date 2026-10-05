@@ -37,6 +37,8 @@ Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on firs
 
 The Lua sources are in `src`. To assemble a package, copy those files into `Data/NightVisionConfigurable/Scripts`, copy all PNG files from `assets` into `Data/NightVisionConfigurable/Textures`, and put `package/enabled.txt` and `package/mod_settings.ini` in `Data/NightVisionConfigurable`. Put `package/mod.manifest` at archive root, alongside a UTF-8 `README.txt` made from this README and the license files. The pinned common modules and unchanged menu helper are already bundled; no compiler or separate common-library installation is required.
 
+The separate [Natural prototype](Unreal/README.md) has original Unreal 5.5.4 material/Blueprint assets and an optional F8 preview entry point in `preview`. It is not enabled by the normal entry point or menu.
+
 Keep the `Nexus` release materials, changelog, release notes and provenance files at archive root, outside `Data`.
 
 ## Credits

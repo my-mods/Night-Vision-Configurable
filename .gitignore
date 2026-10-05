@@ -2,3 +2,8 @@
 *.zip
 AGENTS.md
 agent-notes/
+Unreal/Saved/
+Unreal/Intermediate/
+Unreal/DerivedDataCache/
+Unreal/.vs/
+Unreal/Content/LocalTests/
