@@ -24,7 +24,7 @@ The Lua module loads the generated class directly through `KismetSystemLibrary.M
 
 For Windows cooking, use the project's packaging settings and retain inline material shader code. Include only the four assets under `Content/NightVisionConfigurable` in the mod's container. Keep their `/Game/NightVisionConfigurable` package names and the `Dawnwalker` project mount. The project settings, editor source assets and engine content are authoring inputs, not game deployment files.
 
-The archive includes Radius, Fullscreen and Natural. Mode 2 (Natural) is the default for new configurations; existing saved mode choices are preserved. Natural adds `naturalFocusSize` (40–100, default 90) and `naturalSoftness` (20–100, default 70), both in 5-point steps, and reuses `brightnessPercent` for the central enhancement. Successful component recreation resets the failed-attempt budget; repeated menu visits do not exhaust it.
+The archive includes Fullscreen, Natural and Radius. Mode 1 (Fullscreen) is the default for new configurations; existing saved mode choices are preserved. Natural adds `naturalFocusSize` (40–100, default 90) and `naturalSoftness` (20–100, default 70), both in 5-point steps, and reuses `brightnessPercent` for the central enhancement. Successful component recreation resets the failed-attempt budget; repeated menu visits do not exhaust it.
 
 `preview/main.lua` retains the earlier optional F8 authoring test; it is not the normal package entry point. Production uses `src/main.lua` and the metadata/layout files under `package/`. Both Lua and cooked containers use game-relative paths under `Dawnwalker/`; `Data` contains only a layout note.
 

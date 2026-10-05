@@ -1,6 +1,6 @@
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
-local settings={enabled=1,nightVisionMode=2,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
+local settings={enabled=1,nightVisionMode=1,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
     monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,controllerInput=1,debugLogging=0}
 local warnings={}
 local warningCount=0

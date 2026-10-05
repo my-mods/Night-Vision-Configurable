@@ -7,7 +7,7 @@ for value=40,100,5 do naturalSizes[#naturalSizes+1]=value end
 for value=20,100,5 do naturalSoftnesses[#naturalSoftnesses+1]=value end
 M.schema = {
     {key='enabled',values={0,1},default=1},
-    {key='nightVisionMode',values={0,1,2},default=2},
+    {key='nightVisionMode',values={1,2,0},default=1},
     {key='radiusMeters',min=5,max=50,integer=true,default=6},
     {key='naturalFocusSize',values=naturalSizes,default=90},
     {key='naturalSoftness',values=naturalSoftnesses,default=70},
