@@ -4,7 +4,7 @@
   "category": "Visuals",
   "author": "oOCamilleOo",
   "language": "English",
-  "version": "0.1.1",
+  "version": "1.0",
   "source": "https://github.com/my-mods/Night-Vision-Configurable",
   "tags": [
     "Gameplay",
@@ -18,7 +18,7 @@
   "file": {
     "name": "Night Vision - Configurable",
     "archive": "Night-Vision-Configurable.zip",
-    "version": "0.1.1",
+    "version": "1.0",
     "category": "main",
     "descriptionFile": "file-description.txt",
     "allowModManagerDownload": true,
@@ -47,5 +47,27 @@
     "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/294",
     "credit": "Made with permission."
   },
-  "requirementsMode": "file-to-file"
+  "requirementsMode": "file-to-file",
+  "media": [
+    {
+      "file": "media/01-fullscreen.png",
+      "title": "Fullscreen"
+    },
+    {
+      "file": "media/02-fullscreen-black-and-white.png",
+      "title": "Fullscreen — Black & White"
+    },
+    {
+      "file": "media/03-sin-city.png",
+      "title": "Sin City — Black & White with Keep blood red"
+    },
+    {
+      "file": "media/03-natural.png",
+      "title": "Natural"
+    },
+    {
+      "file": "media/04-radius-red-tint.png",
+      "title": "Radius — Red tint"
+    }
+  ]
 }

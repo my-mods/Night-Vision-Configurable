@@ -1,1 +1,1 @@
-Vampire night vision with Radius, Fullscreen and Natural modes. Brighten a soft central oval while keeping darkness at the edges, adjust colours and a vampire vignette, and toggle with N or hold L3. Stays enabled through loading.
+Explore the night your way with Fullscreen, Natural or Radius vision. Adjust brightness, colours and a soft vampire border. Toggle with N or hold L3 while in vampire form.

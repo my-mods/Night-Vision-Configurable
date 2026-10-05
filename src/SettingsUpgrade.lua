@@ -1,5 +1,6 @@
 -- Add missing schema defaults before the menu reads the on-disk INI.
--- Existing values are never reset. Transactions run only at settings-load boundaries.
+-- Existing choices are retained; retired slider values snap to the closest picker step.
+-- Transactions run only at settings-load boundaries.
 local Store=require('SettingsStore')
 local M={}
 function M.complete(original,schema)
@@ -29,6 +30,25 @@ function M.complete(original,schema)
                 legacy[key]=tonumber(value)
             end
         end
+    end
+    -- The 1.0 Black & White picker uses 5% steps. Retain an old between-step
+    -- assignment as a comment and back up the untouched file through load().
+    if present.monochrome==1 and legacy.monochrome and legacy.monochrome>=0
+        and legacy.monochrome<=100 and legacy.monochrome%1==0 and legacy.monochrome%5~=0 then
+        local value=5*math.floor(legacy.monochrome/5+0.5)
+        local sectionName=''
+        local normalized={}
+        for full in (text..'\n'):gmatch('([^\n]*\n)') do
+            local body,eol=full:match('^(.-)(\r?\n)$')
+            local clean=body:gsub('[;#].*$',''):match('^%s*(.-)%s*$')
+            local header=clean:match('^%[([^%]]+)%]$')
+            if header then sectionName=header
+            elseif sectionName=='Settings' and clean:match('^monochrome%s*=') then
+                full='; Before 1.0 percentage picker: '..body..eol..'monochrome = '..value..eol
+            end
+            normalized[#normalized+1]=full
+        end
+        text=table.concat(normalized):sub(1,-2)
     end
     local added={}
     local migratedBrightness

@@ -1,5 +1,5 @@
 {
-  "implementation": "Independent Lua brightness/colour effect, owned white-to-red radius light, soft vampire-texture overlay and lifecycle/input controller",
+  "implementation": "Independent Lua vision controller, original cooked Natural and world-distance Radius post-process materials, selective red colour filters and soft vampire-texture overlay",
   "inspiration": {
     "name": "Night Vision",
     "author": "opogode",
