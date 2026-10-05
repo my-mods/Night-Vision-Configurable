@@ -1,29 +1,29 @@
-Night Vision - Configurable 1.0: upgrading from 0.1.x
+Night Vision - Configurable 1.0: updating from 0.1.x
 
-The new archive includes both the night vision scripts and visual assets. Vortex
-must run its installer again to select Root (game folder). Redeploying an older
-installation by itself does not update its stored folder layout.
+Close the game, install the new Night-Vision-Configurable.zip through Vortex as
+an update to the existing mod, and deploy. You do not need to disable or remove
+the previous version manually, or change the mod type yourself.
 
-1. Close the game. Back up your settings.ini from:
-   Dawnwalker/Binaries/Win64/ue4ss/Mods/NightVisionConfigurable/
-2. Disable/remove the previous Night Vision - Configurable installation in Vortex,
-   then deploy so Vortex removes its old managed files.
-3. Install Night-Vision-Configurable.zip through Vortex. Confirm its mod type is
-   Root (game folder), then enable and deploy. Keep only this version enabled.
-4. If your settings.ini was removed with the old installation, restore your backup
-   to the same NightVisionConfigurable folder before launching the game.
-5. Launch the game once. The included settings migration adds missing controls,
-   preserves existing choices, and converts the old brightness setting. Black & White
-   values between 5% steps are rounded to the nearest step. The original value is
-   kept as a comment. It saves
-   settings.ini.before-upgrade before changing an older INI. Then open Mod Settings
-   > Night Vision - Configurable and Apply your preferred appearance.
+With one profile, Vortex normally replaces the older version automatically.
+With multiple profiles, choose Update current profile or Update all profiles.
+Both run the new archive's installer. It selects Root (game folder), puts the
+scripts at their existing location, and adds the new visual assets.
 
-The archive does not replace your entire INI or include personal preferences.
-An existing before-upgrade backup is kept. Invalid or duplicate settings are left
-untouched; correct the reported entry before retrying. Older brightness settings
-may need an adjustment because the appearance has changed.
+On your next launch, the included settings migration adds missing controls,
+converts the old brightness setting, and preserves existing choices. Black &
+White values between 5% steps are rounded to the nearest step, with the original
+assignment retained as a comment. A settings.ini.before-upgrade backup is saved
+before changing an older INI; an existing backup is kept.
 
-The installer routes scripts to the same mod folder as 0.1.1 and adds the visual
-assets under Dawnwalker/Content/Paks/~mods. It cannot repair an already stored
-Vortex layout or disable another installed copy: those steps stay in Vortex.
+The archive does not include or overwrite your personal settings.ini. Normally
+this game-created file stays in place during Vortex replacement and is migrated
+automatically. A separate preference backup is optional protection, especially
+if you previously added that INI to Vortex's managed files or staging folder.
+
+Invalid or duplicate settings are left untouched; correct the reported entry
+before retrying. Older brightness settings may need an adjustment because the
+appearance has changed.
+
+Simply clicking Deploy without installing the new ZIP does not update the mod.
+If the older installation already had incorrect routing, reinstall through
+Vortex to rerun its installer. Do not enable both versions in the same profile.
