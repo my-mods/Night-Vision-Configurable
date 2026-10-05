@@ -6,13 +6,17 @@ local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
 local function need(o,label) assert(valid(o),'Unavailable '..label);return o end
 local function object(path) return need(StaticFindObject(path),path) end
-local function signature(path,expected)
+local function signature(path,expected,blueprint)
     local count=0
     object(path):ForEachProperty(function(p)
         count=count+1
         local spec=expected[count]
         assert(spec and p:GetFName():ToString()==spec[1]
             and p:GetFullName():match('^(%S+)')==spec[2],'Unsupported signature: '..path)
+        -- Owned Blueprint functions place parameters before generated locals.
+        -- ForEachProperty includes both; UE4SS separately enforces NumParms
+        -- when invoking the function, before marshalling or ProcessEvent.
+        if blueprint and count==#expected then return true end
     end)
     assert(count==#expected,'Incomplete signature: '..path)
 end
@@ -74,9 +78,9 @@ function M.new(report)
             if not valid(class) then class=StaticFindObject(base) end
         end
         need(class,'cooked Natural helper class')
-        signature(base..':InitializeNatural',{{'ReturnValue','BoolProperty'}})
+        signature(base..':InitializeNatural',{{'ReturnValue','BoolProperty'}},true)
         signature(base..':ConfigureNatural',{{'BrightnessPercent','FloatProperty'},
-            {'FocusSizePercent','FloatProperty'},{'SoftnessPercent','FloatProperty'}})
+            {'FocusSizePercent','FloatProperty'},{'SoftnessPercent','FloatProperty'}},true)
         owner=pawn;camera=target
         component=need(owner:AddComponentByClass(class,true,transform,true),'Natural component')
         assert(same(component:GetOwner(),owner),'Natural component owner changed')
