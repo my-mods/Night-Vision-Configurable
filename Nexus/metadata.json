@@ -6,7 +6,12 @@
   "language": "English",
   "version": "0.1.1",
   "source": "https://github.com/my-mods/Night-Vision-Configurable",
-  "tags": ["Gameplay", "Quality of Life", "AI-Generated Content", "AI Media"],
+  "tags": [
+    "Gameplay",
+    "Quality of Life",
+    "AI-Generated Content",
+    "AI Media"
+  ],
   "summaryFile": "summary.txt",
   "descriptionFile": "description.bbcode",
   "permissionsFile": "permissions.txt",
@@ -22,11 +27,11 @@
   },
   "requirements": [
     {
-      "anyOf": [
-        {"name": "UE4SS for Dawnwalker", "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/18"},
-        {"name": "UE4SS for BoD", "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/283"}
-      ],
-      "note": "Install one Dawnwalker-compatible UE4SS package with Lua 5.4, game-thread delayed actions, cancellation and native function hooks."
+      "name": "UE4SS for Dawnwalker by Vercadi",
+      "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/18",
+      "minimumVersion": "1.3",
+      "optional": false,
+      "note": "Required: Vercadi's UE4SS for Dawnwalker, Nexus version 1.3 (RC6) or later."
     },
     {
       "name": "Mod Setting Menu",
@@ -41,5 +46,6 @@
     "author": "opogode",
     "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/294",
     "credit": "Made with permission."
-  }
+  },
+  "requirementsMode": "file-to-file"
 }
