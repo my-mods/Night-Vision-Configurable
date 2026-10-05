@@ -117,7 +117,10 @@ function M.new(report,directory)
     function api.apply(settings, pulse)
         local h=assert(held,'No camera'); assert(sameCamera(h),'Camera replaced')
         local pp=h.camera.PostProcessSettings
-        local keepRed=settings.keepBloodRed==1 and settings.monochrome>0
+        -- Natural owns its colour treatment inside the oval material. Restore
+        -- our camera overrides on mode changes; retain other effects' baselines.
+        local monochrome=settings.nightVisionMode==2 and 0 or settings.monochrome
+        local keepRed=settings.keepBloodRed==1 and monochrome>0
         if not keepRed or h.lutBrightness~=settings.redBrightnessPercent then h.lutAttempted=nil end
         if keepRed and not h.lutAttempted then
             h.lutAttempted=true
@@ -172,10 +175,10 @@ function M.new(report,directory)
             red=0;brightness=1
             report('Fullscreen brightness/red tint unavailable: camera colour tint is unsupported; Radius and Black & White remain enabled.')
         end
-        local fraction=keepRed and 0 or 1-(1-settings.monochrome/100)*(1-red)
+        local fraction=keepRed and 0 or 1-(1-monochrome/100)*(1-red)
         if keepRed then
             desired.ColorGradingLUT={isObject=true,reference=h.lut}
-            desired.ColorGradingIntensity=settings.monochrome/100
+            desired.ColorGradingIntensity=monochrome/100
         end
         if fraction>0 then
             local base=original.override and original.value or {X=1,Y=1,Z=1,W=1}

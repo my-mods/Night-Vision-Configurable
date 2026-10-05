@@ -104,7 +104,7 @@ syncVision=function(pulse,inspect,scopeChecked)
     if form==true and target then appearance.sync(scope,settings,inspect)
     else appearance.release() end
     -- Natural owns a separate component; its failure must not suspend the
-    -- existing colour controls or either of the other vision modes.
+    -- separate vignette or either of the other vision modes.
     if settings.nightVisionMode==2 and form==true and target then
         if inspect or pulse~=nil then natural.sync(scope.pawn,target,settings,inspect) end
     else natural.release() end

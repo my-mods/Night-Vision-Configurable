@@ -24,9 +24,10 @@ function M.new(report)
     local component,owner,camera
     local attempts,cleanupAttempts=0,0
     local reported=false
-    local brightness,size,softness
+    local brightness,size,softness,monochrome,keepRed,redBrightness
     local retiring=false
     local requestedPawn,requestedCamera,requestedBrightness,requestedSize,requestedSoftness
+    local requestedMonochrome,requestedKeepRed,requestedRedBrightness
     local api={}
     local function diagnostic(reason)
         if reported then return end
@@ -54,6 +55,7 @@ function M.new(report)
         end
         component=nil;owner=nil;camera=nil
         brightness=nil;size=nil;softness=nil
+        monochrome=nil;keepRed=nil;redBrightness=nil
         cleanupAttempts=0
         retiring=false
         return true
@@ -62,7 +64,12 @@ function M.new(report)
         if not api.release() then return false end
         attempts=0;reported=false
         requestedPawn=nil;requestedCamera=nil;requestedBrightness=nil;requestedSize=nil;requestedSoftness=nil
+        requestedMonochrome=nil;requestedKeepRed=nil;requestedRedBrightness=nil
         return true
+    end
+    local function configure(settings)
+        component:ConfigureNatural(settings.brightnessPercent,settings.naturalFocusSize,settings.naturalSoftness)
+        component:ConfigureNaturalColour(settings.monochrome,settings.keepBloodRed,settings.redBrightnessPercent)
     end
     local function create(pawn,target,settings)
         signature('/Script/Engine.Actor:AddComponentByClass',{
@@ -88,6 +95,8 @@ function M.new(report)
         signature(base..':InitializeNatural',{{'ReturnValue','BoolProperty'}},true)
         signature(base..':ConfigureNatural',{{'BrightnessPercent','FloatProperty'},
             {'FocusSizePercent','FloatProperty'},{'SoftnessPercent','FloatProperty'}},true)
+        signature(base..':ConfigureNaturalColour',{{'MonochromePercent','FloatProperty'},
+            {'KeepBloodRed','FloatProperty'},{'RedBrightnessPercent','FloatProperty'}},true)
         owner=pawn;camera=target
         component=need(owner:AddComponentByClass(class,true,transform,true),'Natural component')
         assert(same(component:GetOwner(),owner),'Natural component owner changed')
@@ -95,7 +104,7 @@ function M.new(report)
         assert(component.bEnabled==false and component.bUnbound==true
             and component.BlendWeight==1,'Unsupported Natural component defaults')
         assert(component:InitializeNatural()==true,'Natural material initialization failed')
-        component:ConfigureNatural(settings.brightnessPercent,settings.naturalFocusSize,settings.naturalSoftness)
+        configure(settings)
         owner:FinishAddComponent(component,true,transform)
         component.bEnabled=true
         assert(component.bEnabled==true,'Natural component could not enable')
@@ -109,24 +118,28 @@ function M.new(report)
             if not api.release() then return false end
             attempts=0
         elseif requestedBrightness~=settings.brightnessPercent or requestedSize~=settings.naturalFocusSize
-            or requestedSoftness~=settings.naturalSoftness then
+            or requestedSoftness~=settings.naturalSoftness or requestedMonochrome~=settings.monochrome
+            or requestedKeepRed~=settings.keepBloodRed or requestedRedBrightness~=settings.redBrightnessPercent then
             attempts=0
         end
         requestedPawn=pawn;requestedCamera=target;requestedBrightness=settings.brightnessPercent
         requestedSize=settings.naturalFocusSize;requestedSoftness=settings.naturalSoftness
+        requestedMonochrome=settings.monochrome;requestedKeepRed=settings.keepBloodRed;requestedRedBrightness=settings.redBrightnessPercent
         local changed=brightness~=settings.brightnessPercent or size~=settings.naturalFocusSize
-            or softness~=settings.naturalSoftness
+            or softness~=settings.naturalSoftness or monochrome~=settings.monochrome
+            or keepRed~=settings.keepBloodRed or redBrightness~=settings.redBrightnessPercent
         if component and inspect and not valid(component) then component=nil end
         if valid(component) and not changed then return true end
         if not valid(component) and (attempts>=3 or (attempts>0 and not inspect)) then return false end
         if not valid(component) then attempts=attempts+1 end
         local ok,err=pcall(function()
             if valid(component) then
-                component:ConfigureNatural(settings.brightnessPercent,settings.naturalFocusSize,settings.naturalSoftness)
+                configure(settings)
             else
                 create(pawn,target,settings)
             end
             brightness=settings.brightnessPercent;size=settings.naturalFocusSize;softness=settings.naturalSoftness
+            monochrome=settings.monochrome;keepRed=settings.keepBloodRed;redBrightness=settings.redBrightnessPercent
             attempts=0 -- Successful recreation after a menu is not a failed retry.
         end)
         if not ok then diagnostic(err);api.release();return false end

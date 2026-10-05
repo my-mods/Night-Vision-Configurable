@@ -2,7 +2,7 @@
 
 This Unreal Engine 5.5 project contains the original assets for Natural night vision. Open `Dawnwalker.uproject` with Unreal Editor 5.5.4. The assets use engine classes only; they require no custom runtime plugin or native DLL.
 
-`M_NaturalVision` is a post-process material at **Scene Color After Tonemapping**. It samples `PostProcessInput0` once and blends an enhanced scene colour into the original with a smooth oval in viewport coordinates. Its Custom expression is also provided as `SourceAssets/NaturalVision.hlsl`; update the expression when editing that source file.
+`M_NaturalVision` is a post-process material at **Scene Color After Tonemapping**. It samples `PostProcessInput0` once and blends brightness and colour treatment into the original with one smooth oval in viewport coordinates. Monochrome, red preservation and red brightness share that mask, leaving the input unchanged outside it. Its Custom expression is also provided as `SourceAssets/NaturalVision.hlsl`; update the expression when editing that source file.
 
 The brightness curve scales all three colour channels equally, using the brightest channel to approach the SDR white limit smoothly. Black stays black, 100% brightness is neutral, and values above SDR white pass through. The oval is relative to the viewport, with a small guard margin that remains outside the effect even at maximum size. This is an SDR design; HDR output needs separate validation.
 
@@ -13,7 +13,10 @@ The component exposes these functions:
 | Function | Purpose |
 | --- | --- |
 | `InitializeNatural()` | Create and retain the material instance, register its blendable, and return whether the instance is valid. Call once on each new component. |
-| `ConfigureNatural(BrightnessPercent, FocusSizePercent, SoftnessPercent)` | Set the three scalar parameters. Brightness accepts 25–300, size 40–100 and softness 20–100. Suggested values are 200, 90 and 70. |
+| `ConfigureNatural(BrightnessPercent, FocusSizePercent, SoftnessPercent)` | Set brightness (25–300), size (40–100) and softness (20–100). Suggested values are 200, 90 and 70. |
+| `ConfigureNaturalColour(MonochromePercent, KeepBloodRed, RedBrightnessPercent)` | Set monochrome (0–100), red preservation (0 or 1) and red brightness (100–500), all plain numeric parameters. Defaults are 0, 0 and 100. |
+
+Natural uses no camera saturation or colour-lookup override. Mode changes restore the mod's previous camera overrides through the existing ownership journal. Colour treatment uses the rendered scene after tonemapping, so it need not match the other modes' pre-tonemapping grading exactly. Red selection follows hue, saturation and chroma, not object identity; red gain preserves channel ratios and stays within SDR highlight headroom. The monochrome amount blends that treatment with the enhanced colour before the shared oval blend. Zero monochrome preserves the original Natural brightness result. No extra scene read or rendering pass is added. The Lua module validates both configuration functions before creating a component; older helper assets fail only Natural, with a bounded diagnostic.
 
 Create the component on the current player actor with deferred registration, initialize and configure it, finish registration, then set `bEnabled`. Disable and destroy the owned component when its player or camera is no longer current. `src/Natural.lua` supplies bounded creation, configuration and cleanup without calling blendable interfaces from Lua. `src/main.lua` selects it for mode 2, retains activation intent through supported loading/camera transitions, and releases it on menus, deactivation and human form.
 
