@@ -12,11 +12,13 @@ Choose **Night Vision Mode: Radius / Fullscreen**. Radius lights the area around
 
 **Keep blood red** is an optional toggle under Black & White, default **Off**. On preserves red shades while the slider removes other colours, so blood and the vampire vignette can stay red together. It also preserves similarly red clothing and objects. Dark or discoloured blood may lose some colour, and lighting still affects the result. Use it with **HDR output off**. With HDR enabled, an unavailable filter or another camera colour filter taking priority, ordinary Black & White remains active and the vignette stays red.
 
+**Red brightness** appears when Keep blood red is On. It runs from **100% to 500% in 10% steps**, default **100%** for the original brightness. Higher values brighten preserved reds in the world, including other red objects. The Black & White slider controls how strongly this colour filter is applied; already bright reds can reach the display's brightness limit. The vampire border has separate controls. Turning Keep blood red Off hides the slider and retains its saved value.
+
 Menus temporarily hide the light, border and camera effects; returning to gameplay restores them without another toggle. Pausing, showing the mouse cursor, blocking movement or hiding gameplay UI also suspends the effects and shortcuts. Turning vision off removes its light and border and restores camera values still owned by the mod. No chromatic aberration is added. Changes made by other game effects are preserved when night vision ends.
 
 ## Dependencies
 
-A Dawnwalker-compatible UE4SS installation providing Lua 5.4, game-thread delayed actions, cancellation and native function hooks. Dawnwalker Mod Menu **1.0.6 or later** is optional for the settings page and live Apply; its console bridge needs `HookProcessConsoleExec=1` in the UE4SS profile.
+Requires [UE4SS for Dawnwalker by Vercadi](https://www.nexusmods.com/thebloodofdawnwalker/mods/18) **1.3 (RC6) or later**, providing Lua 5.4, game-thread delayed actions, cancellation and native function hooks. Dawnwalker Mod Menu **1.0.6 or later** is optional for the settings page and live Apply; its console bridge needs `HookProcessConsoleExec=1` in the UE4SS profile.
 
 ## Installation
 
@@ -33,7 +35,7 @@ Without the menu, edit `NightVisionConfigurable/settings.ini`, generated on firs
 
 ## Source and packaging
 
-The Lua sources are in `src`. To assemble a package, copy those files into `Data/NightVisionConfigurable/Scripts`, copy both PNG files from `assets` into `Data/NightVisionConfigurable/Textures`, and put `package/enabled.txt` and `package/mod_settings.ini` in `Data/NightVisionConfigurable`. Put `package/mod.manifest` at archive root, alongside a UTF-8 `README.txt` made from this README and the license files. The pinned common modules and unchanged menu helper are already bundled; no compiler or separate common-library installation is required.
+The Lua sources are in `src`. To assemble a package, copy those files into `Data/NightVisionConfigurable/Scripts`, copy all PNG files from `assets` into `Data/NightVisionConfigurable/Textures`, and put `package/enabled.txt` and `package/mod_settings.ini` in `Data/NightVisionConfigurable`. Put `package/mod.manifest` at archive root, alongside a UTF-8 `README.txt` made from this README and the license files. The pinned common modules and unchanged menu helper are already bundled; no compiler or separate common-library installation is required.
 
 Keep the `Nexus` release materials, changelog, release notes and provenance files at archive root, outside `Data`.
 

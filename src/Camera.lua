@@ -118,9 +118,10 @@ function M.new(report,directory)
         local h=assert(held,'No camera'); assert(sameCamera(h),'Camera replaced')
         local pp=h.camera.PostProcessSettings
         local keepRed=settings.keepBloodRed==1 and settings.monochrome>0
-        if not keepRed then h.lutAttempted=nil end
+        if not keepRed or h.lutBrightness~=settings.redBrightnessPercent then h.lutAttempted=nil end
         if keepRed and not h.lutAttempted then
             h.lutAttempted=true
+            h.lutBrightness=settings.redBrightnessPercent
             local ok,value=pcall(function()
                 if not h.fields.ColorGradingLUT then
                     local fields={}
@@ -136,7 +137,7 @@ function M.new(report,directory)
                 -- A Lua wrapper does not keep an Unreal texture alive. Do not
                 -- displace another effect's LUT and risk losing its only owner.
                 assert(not valid(h.fields.ColorGradingLUT.value.reference),'The camera already uses another colour lookup texture')
-                return bloodTexture(h.owner)
+                return bloodTexture(h.owner,settings.redBrightnessPercent)
             end)
             if ok then h.lut=value
             else h.lut=nil;report('Keep blood red unavailable; regular Black & White remains active: '..tostring(value)) end

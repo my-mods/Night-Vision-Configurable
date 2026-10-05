@@ -2,6 +2,7 @@
 
 ## In development
 
+- Added Red brightness from 100–500% in 10% steps, shown when Keep blood red is On; the border stays separately controlled.
 - Added Keep blood red for Black & White with HDR off; other red objects and the vampire border stay coloured too.
 - Fixed the settings page showing “config key missing or ambiguous” after an upgrade.
 - Choose Radius or Fullscreen night vision, with a 5–50 metre light radius in 1-metre steps.

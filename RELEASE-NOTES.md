@@ -1,5 +1,6 @@
 Night Vision - Configurable 0.1.1 — development build
 
+- Brighten preserved world reds from 100–500% in 10% steps with the Red brightness slider, shown when Keep blood red is On.
 - Added Keep blood red for Black & White with HDR off. Other red objects and the vampire border stay coloured too.
 - Fixed the settings page failing to open after an upgrade.
 - Choose Radius or Fullscreen; set the radius from 5–50 metres in 1-metre steps.

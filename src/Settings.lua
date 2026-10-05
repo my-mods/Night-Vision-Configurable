@@ -1,5 +1,7 @@
 local M = {}
 local Upgrade = require('SettingsUpgrade')
+local redBrightnessValues={}
+for value=100,500,10 do redBrightnessValues[#redBrightnessValues+1]=value end
 M.schema = {
     {key='enabled',values={0,1},default=1},
     {key='nightVisionMode',values={0,1},default=1},
@@ -8,6 +10,7 @@ M.schema = {
     {key='vignetteOpacity',min=0,max=100,integer=true,default=20},
     {key='monochrome',min=0,max=100,integer=true,default=0},
     {key='keepBloodRed',values={0,1},default=0},
+    {key='redBrightnessPercent',values=redBrightnessValues,default=100},
     {key='redMonochrome',min=0,max=100,integer=true,default=0},
     {key='brightnessPercent',min=25,max=300,integer=true,default=200},
     {key='controllerInput',values={0,1},default=1},

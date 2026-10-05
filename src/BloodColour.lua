@@ -15,15 +15,17 @@ local function signature(path,expected)
     assert(index==#expected,'Incomplete signature: '..path)
 end
 function M.new(directory)
-    local texture
-    return function(context)
+    local textures={}
+    return function(context,brightness)
+        assert(type(brightness)=='number' and brightness>=100 and brightness<=500
+            and brightness%10==0,'Invalid red brightness')
         -- Legacy colour lookup tables are a display-referred SDR operation.
         -- Do not bypass ordinary desaturation on an HDR output path.
         signature('/Script/Engine.KismetSystemLibrary:GetConsoleVariableIntValue',{
             {'VariableName','StrProperty'},{'ReturnValue','IntProperty'}})
         local system=object('/Script/Engine.Default__KismetSystemLibrary')
         assert(system:GetConsoleVariableIntValue('r.HDR.EnableHDROutput')==0,'Keep blood red requires HDR output to be off')
-        if valid(texture) then return texture end
+        if valid(textures[brightness]) then return textures[brightness] end
         signature('/Script/Engine.KismetRenderingLibrary:ImportFileAsTexture2D',{
             {'WorldContextObject','ObjectProperty'},{'Filename','StrProperty'},{'ReturnValue','ObjectProperty'}})
         signature('/Script/Engine.Texture2D:Blueprint_GetSizeX',{{'ReturnValue','IntProperty'}})
@@ -37,15 +39,16 @@ function M.new(directory)
             assert(type(value.SRGB)=='boolean','Unknown blood colour texture encoding')
             return value
         end
-        local value=load('KeepBloodRed.png')
+        local stem='KeepBloodRed'..(brightness==100 and '' or '-'..string.format('%d',brightness))
+        local value=load(stem..'.png')
         -- Account for the importer's actual GPU sampling mode without changing
         -- texture resource flags after creation. Both files encode the same LUT.
         if value.SRGB then
-            value=load('KeepBloodRed-sRGB.png')
+            value=load(stem..'-sRGB.png')
             assert(value.SRGB,'Blood colour texture encoding changed during import')
         end
-        texture=value
-        return texture
+        textures[brightness]=value
+        return value
     end
 end
 return M

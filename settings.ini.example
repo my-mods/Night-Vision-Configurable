@@ -9,6 +9,8 @@ vignetteOpacity = 20
 monochrome = 0
 ; Preserve red shades with Black & White. Other red objects also stay coloured.
 keepBloodRed = 0
+; Keep blood red only: 100% = normal, up to 500%, in 10% steps
+redBrightnessPercent = 100
 ; Red tint colours the light in Radius mode, the view in Fullscreen mode
 redMonochrome = 0
 ; 25 to 300%, in 5% steps. 100% = normal view / standard radius light
