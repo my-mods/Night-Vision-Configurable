@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Night vision stays available while surveying from scouting towers, including its keyboard and controller shortcuts.
+
 ## 1.0
 
 - Choose from three night vision modes: Fullscreen (default), Natural and Radius.

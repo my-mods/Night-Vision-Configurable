@@ -60,15 +60,53 @@ local function current(s)
         and valid(s.pc) and same(s.pc:GetWorld(),s.world)
         and same(s.pc.Pawn,s.pawn) and same(s.pawn:GetWorld(),s.world)
 end
+local function supportsQuery(path,returnType)
+    local ok,supported=pcall(function()
+        local fn=StaticFindObject(path)
+        if not valid(fn) then return false end
+        local count,compatible=0,true
+        fn:ForEachProperty(function(p)
+            count=count+1
+            compatible=compatible and p:GetFName():ToString()=='ReturnValue'
+                and p:GetFullName():match('^(%S+)')==returnType
+        end)
+        return compatible and count==1
+    end)
+    return ok and supported
+end
+local function playState(s,reason)
+    if s.playReason~=reason then
+        s.playReason=reason
+        if wanted and settings.debugLogging==1 then trace('Vision context: '..reason) end
+    end
+    return reason=='gameplay' or reason=='tower survey'
+end
 local function playable(s)
-    if gameplay:IsGamePaused(s.world) or s.pc.bShowMouseCursor==true
-        or s.pc:IsMoveInputIgnored() then return false end
+    if gameplay:IsGamePaused(s.world) then return playState(s,'paused') end
+    if s.pc.bShowMouseCursor==true then return playState(s,'mouse cursor') end
     if valid(uiManager) and same(uiManager:GetWorld(),s.world) then
         local ok,visible=pcall(function() return uiManager:ShouldShowGameplayWidgets() end)
-        if ok and visible==false then return false end
+        if ok and visible==false then return playState(s,'gameplay UI hidden') end
         if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; input/menu guards remain active.') end
     end
-    return true
+    if s.pc:IsMoveInputIgnored() then
+        -- Scouting locks walking while retaining the player's camera. Only this
+        -- verified tower state may bypass movement locking; menus still win.
+        if s.towerQueries then
+            local ok,survey=pcall(function()
+                local tower=s.pawn:GetActiveTower()
+                return valid(tower) and same(tower:GetWorld(),s.world)
+                    and s.pc:IsLookInputIgnored()==false
+            end)
+            if ok and survey then return playState(s,'tower survey') end
+            if not ok then
+                s.towerQueries=false
+                report('Tower survey detection unavailable; movement/menu guards remain active.')
+            end
+        end
+        return playState(s,'movement locked')
+    end
+    return playState(s,'gameplay')
 end
 local function vampire(s)
     local asc=s.pawn.AbilitySystemComponent
@@ -259,6 +297,9 @@ local function discover(job)
         if not valid(gameplay) then gameplay=StaticFindObject('/Script/Engine.Default__GameplayStatics') end
         if not valid(cameraClass) then cameraClass=StaticFindObject('/Script/Engine.CameraComponent') end
         if not valid(uiManager) then uiManager=FindFirstOf('UIManagerSubsystem') end
+        job.towerQueries=supportsQuery('/Script/Dawnwalker.DawnwalkerPlayerCharacter:GetActiveTower','ObjectProperty')
+            and supportsQuery('/Script/Engine.Controller:IsLookInputIgnored','BoolProperty')
+        if not job.towerQueries then report('Tower survey queries unavailable or incompatible; ordinary night vision remains available.') end
     end
     if not valid(engine) or not valid(gameplay) or not valid(cameraClass) then return end
     local viewport=engine.GameViewport
@@ -269,7 +310,7 @@ local function discover(job)
     if not valid(pc) or not pc:IsLocalController() or not same(pc:GetWorld(),world) then return end
     local pawn=pc.Pawn
     if not valid(pawn) or not same(pawn:GetWorld(),world) then return end
-    return {pc=pc,pawn=pawn,world=world}
+    return {pc=pc,pawn=pawn,world=world,towerQueries=job.towerQueries}
 end
 wake=function(reason)
     if loading or settings.enabled~=1 or worker then return end

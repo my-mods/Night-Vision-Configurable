@@ -1,5 +1,6 @@
 Night Vision - Configurable 1.0
 
+- Night vision stays available while surveying from scouting towers, including its keyboard and controller shortcuts.
 - Choose from three night vision modes: Fullscreen (default), Natural and Radius.
 - Natural brightens a central oval with adjustable size and a soft fade into the surrounding darkness.
 - Radius brightens nearby scenery within 5–50 metres, fading smoothly with distance without a torch-like glow.
