@@ -21,6 +21,7 @@ local camera=require('Camera').new(report,directory)
 local appearance=require('Appearance').new(report)
 local natural=require('Natural').new(report)
 local radius=require('Radius').new(report)
+local inspection=require('Inspection').new(report)
 local engine,gameplay,cameraClass,stickKey,vampireTag,uiManager
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
@@ -43,7 +44,9 @@ local function restore()
     local extras=appearance.release()
     natural.reset()
     radius.reset()
-    return restoreCamera() and extras
+    local restored=restoreCamera()
+    local inspected=inspection.reset()
+    return restored and extras and inspected
 end
 local function clear()
     generation=generation+1
@@ -79,7 +82,7 @@ local function playState(s,reason)
         s.playReason=reason
         if wanted and settings.debugLogging==1 then trace('Vision context: '..reason) end
     end
-    return reason=='gameplay' or reason=='tower survey'
+    return reason=='gameplay' or reason=='tower survey' or reason=='clue inspection'
 end
 local function playable(s)
     if gameplay:IsGamePaused(s.world) then return playState(s,'paused') end
@@ -90,6 +93,9 @@ local function playable(s)
         if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; input/menu guards remain active.') end
     end
     if s.pc:IsMoveInputIgnored() then
+        -- Investigation consumes its own input while normal move/look input is
+        -- locked. The current local view must be the game's inspection camera.
+        if inspection.matches(s.pc:GetViewTarget(),s.world) then return playState(s,'clue inspection') end
         -- Scouting locks walking while retaining the player's camera. Only this
         -- verified tower state may bypass movement locking; menus still win.
         if s.towerQueries then
@@ -117,7 +123,12 @@ local function vampire(s)
 end
 local function activeTarget(s)
     local target=s.pc:GetViewTarget()
-    if not valid(target) or not same(target:GetWorld(),s.world) then return nil end
+    if not valid(target) or not same(target:GetWorld(),s.world) then inspection.reset();return nil end
+    if inspection.matches(target,s.world) then
+        local component,owner=inspection.target(s.pawn,target,s.world)
+        return component,true,component and target or nil,owner
+    end
+    inspection.reset()
     local c=target:GetComponentByClass(cameraClass)
     if valid(c) and c:IsActive() and same(c:GetOwner(),target) then return c end
 end
@@ -132,25 +143,32 @@ syncVision=function(pulse,inspect,scopeChecked)
         trace('Vision off: human form confirmed.')
         return
     end
+    if form==nil then
+        assert(restore(),'Effect restoration is incomplete')
+        return
+    end
     -- Preserve the toggle while menus/cutscenes hide every owned visual effect.
     if not playable(scope) then
         appearance.hide()
         natural.release()
         radius.release()
         assert(restoreCamera(),'Camera restoration is incomplete')
+        inspection.release()
         return
     end
-    local target=activeTarget(scope)
+    local target,isInspection,visualTarget,visualOwner=activeTarget(scope)
     if token~=generation then return end
-    if form==true and target then appearance.sync(scope,settings,inspect)
+    visualTarget=visualTarget or target
+    visualOwner=visualOwner or scope.pawn
+    if form==true and visualTarget then appearance.sync(scope,settings,inspect)
     else appearance.release() end
     -- Natural owns a separate component; its failure must not suspend the
     -- separate vignette or either of the other vision modes.
-    if settings.nightVisionMode==2 and form==true and target then
-        if inspect or pulse~=nil then natural.sync(scope.pawn,target,settings,inspect) end
+    if settings.nightVisionMode==2 and form==true and visualTarget then
+        if inspect or pulse~=nil then natural.sync(visualOwner,visualTarget,settings,inspect) end
     else natural.release() end
-    if settings.nightVisionMode==0 and form==true and target then
-        if inspect or pulse~=nil then radius.sync(scope.pawn,target,settings,inspect) end
+    if settings.nightVisionMode==0 and form==true and visualTarget then
+        if inspect or pulse~=nil then radius.sync(visualOwner,visualTarget,settings,inspect) end
     else radius.release() end
     if effectFailure and (same(target,effectFailure.target)
         or (not valid(target) and not valid(effectFailure.target))) then
@@ -163,7 +181,7 @@ syncVision=function(pulse,inspect,scopeChecked)
         end
         if form~=true or not target then return end
         if not camera.active() then
-            camera.capture(target)
+            camera.capture(target,isInspection)
             camera.apply(settings,pulse or 0)
             trace('Vision applied to the current camera.')
         elseif pulse~=nil then camera.apply(settings,pulse)
@@ -297,6 +315,7 @@ local function discover(job)
         if not valid(gameplay) then gameplay=StaticFindObject('/Script/Engine.Default__GameplayStatics') end
         if not valid(cameraClass) then cameraClass=StaticFindObject('/Script/Engine.CameraComponent') end
         if not valid(uiManager) then uiManager=FindFirstOf('UIManagerSubsystem') end
+        inspection.prepare()
         job.towerQueries=supportsQuery('/Script/Dawnwalker.DawnwalkerPlayerCharacter:GetActiveTower','ObjectProperty')
             and supportsQuery('/Script/Engine.Controller:IsLookInputIgnored','BoolProperty')
         if not job.towerQueries then report('Tower survey queries unavailable or incompatible; ordinary night vision remains available.') end

@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Night vision stays available while surveying from scouting towers, including its keyboard and controller shortcuts.
+- Night vision stays available while surveying from scouting towers and inspecting clues on objects, including its keyboard and controller shortcuts.
 
 ## 1.0
 

@@ -60,7 +60,7 @@ function M.new(report,directory)
         local h=held
         if not h then return end
         if not sameCamera(h) then held=nil; return end
-        local pp=h.camera.PostProcessSettings
+        local pp=h.camera[h.settingsKey]
         local failures={}
         for _,name in ipairs(h.names) do
             local field=h.fields[name]
@@ -86,18 +86,23 @@ function M.new(report,directory)
                 if not ok then failures[#failures+1]=name..': '..tostring(err) end
             end
         end
-        if h.lastWeight and equal(h.camera.PostProcessBlendWeight,h.lastWeight) then
-            h.camera.PostProcessBlendWeight=h.weight
+        if h.lastWeight and equal(h.camera[h.weightKey],h.lastWeight) then
+            h.camera[h.weightKey]=h.weight
         end
         if #failures>0 then error('Restoration failed: '..table.concat(failures,', ')) end
         held=nil
     end
-    function api.capture(camera)
+    function api.capture(camera,isInspection)
         assert(not held,'Previous camera still owned')
-        assert(valid(camera) and camera:IsActive() and valid(camera:GetOwner()),'Inactive camera')
-        local pp=camera.PostProcessSettings
-        local h={camera=camera,address=camera:GetAddress(),name=camera:GetFullName(),owner=camera:GetOwner(),fields={},names={}}
-        h.weight=camera.PostProcessBlendWeight
+        assert(valid(camera) and valid(camera:GetOwner()),'Invalid camera owner')
+        if isInspection then assert(camera.bEnabled==true,'Inactive inspection host')
+        else assert(camera:IsActive(),'Inactive camera') end
+        local settingsKey=isInspection and 'Settings' or 'PostProcessSettings'
+        local weightKey=isInspection and 'BlendWeight' or 'PostProcessBlendWeight'
+        local pp=camera[settingsKey]
+        local h={camera=camera,address=camera:GetAddress(),name=camera:GetFullName(),owner=camera:GetOwner(),fields={},names={},
+            settingsKey=settingsKey,weightKey=weightKey}
+        h.weight=camera[weightKey]
         assert(finite(h.weight),'Missing camera blend weight')
         -- Validate every required field before writing any property.
         for _,name in ipairs(names) do
@@ -116,7 +121,7 @@ function M.new(report,directory)
     end
     function api.apply(settings, pulse)
         local h=assert(held,'No camera'); assert(sameCamera(h),'Camera replaced')
-        local pp=h.camera.PostProcessSettings
+        local pp=h.camera[h.settingsKey]
         -- Natural owns its colour treatment inside the oval material. Restore
         -- our camera overrides on mode changes; retain other effects' baselines.
         local monochrome=settings.nightVisionMode==2 and 0 or settings.monochrome
@@ -148,7 +153,7 @@ function M.new(report,directory)
         keepRed=keepRed and valid(h.lut)
         -- A game effect can replace these values without replacing the camera.
         -- Adopt only externally changed values as the new restoration baseline.
-        local weight=h.camera.PostProcessBlendWeight
+        local weight=h.camera[h.weightKey]
         assert(finite(weight),'Missing camera blend weight')
         if h.lastWeight and not equal(weight,h.lastWeight) then h.weight=weight end
         for _,name in ipairs(h.names) do
@@ -204,13 +209,13 @@ function M.new(report,directory)
         end
         local blend=(brightness~=1 or fraction>0 or keepRed) and 1 or h.weight
         h.lastWeight=blend
-        if not equal(h.camera.PostProcessBlendWeight,blend) then h.camera.PostProcessBlendWeight=blend end
-        assert(equal(h.camera.PostProcessBlendWeight,blend),'Blend weight write failed')
+        if not equal(h.camera[h.weightKey],blend) then h.camera[h.weightKey]=blend end
+        assert(equal(h.camera[h.weightKey],blend),'Blend weight write failed')
     end
     function api.refresh(settings)
         local h=assert(held,'No camera');assert(sameCamera(h),'Camera replaced')
-        local pp=h.camera.PostProcessSettings
-        local changed=not equal(h.camera.PostProcessBlendWeight,h.lastWeight)
+        local pp=h.camera[h.settingsKey]
+        local changed=not equal(h.camera[h.weightKey],h.lastWeight)
         for _,name in ipairs(h.names) do
             local field=h.fields[name]
             if field.last and (not equal(read(pp,name),field.last.value)
