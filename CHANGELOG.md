@@ -2,6 +2,7 @@
 
 ## In development
 
+- Radius now casts softer light centered on your character, with a broader fade and reduced shiny highlights.
 - Added Natural night vision: a bright central oval with adjustable size and fade, preserving darkness around the edges. Natural is the default for new configurations. Use N/L3 to toggle.
 
 - Added Red brightness from 100–500% in 10% steps, shown when Keep blood red is On; the border stays separately controlled.

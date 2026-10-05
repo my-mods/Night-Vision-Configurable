@@ -2,7 +2,7 @@
 
 Toggle vampire night vision with **N** or by holding **L3 / the left stick for 0.6 seconds**. Release the stick between toggles. Once enabled, vision stays on until you toggle it off or return to human form. Camera changes, save loading and player replacement preserve your choice and automatically resume the effect when a vampire player and camera are ready. A new game session starts with vision off.
 
-Choose **Night Vision Mode: Radius / Fullscreen / Natural**. Radius lights the area around your character like a white torch. Its **Light radius** slider appears only in Radius mode: **5–50 metres**, in **1-metre steps**, default **6 metres**. Fullscreen brightens the whole view. **Natural is the default for new configurations**; existing saved mode choices are preserved.
+Choose **Night Vision Mode: Radius / Fullscreen / Natural**. Radius adds soft light centered on your character, spreading evenly around you with a gradual fade and reduced shiny highlights. Its **Light radius** slider appears only in Radius mode: **5–50 metres**, in **1-metre steps**, default **6 metres**. Fullscreen brightens the whole view. **Natural is the default for new configurations**; existing saved mode choices are preserved.
 
 **Natural** brightens a broad oval around the camera aim, including distant scenery, then fades into the normal night image at the edges. **Natural size** controls the outer oval’s width and height relative to the viewport: **40–100%**, default **90%**. **Fade softness** controls how much of its radius fades gradually: **20–100%**, default **70%**. Both sliders use **5% steps** and appear only in Natural mode. Natural uses N/L3 like the other modes, with no activation flash or time limit. Use SDR output; HDR needs separate validation.
 

@@ -1,5 +1,6 @@
 Night Vision - Configurable 0.1.1 — development build
 
+- Radius now casts softer light centered on your character, with a broader fade and reduced shiny highlights.
 - Added Natural night vision: a bright central oval with adjustable size and fade, preserving darkness around the edges. Natural is the default for new configurations. Use N/L3 to toggle.
 
 - Brighten preserved world reds from 100–500% in 10% steps with the Red brightness slider, shown when Keep blood red is On.

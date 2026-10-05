@@ -3,7 +3,7 @@ local M={}
 local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
 local function need(o,label) assert(valid(o),'Unavailable '..label);return o end
-local transform={Rotation={X=0,Y=0,Z=0,W=1},Translation={X=30,Y=0,Z=45},Scale3D={X=1,Y=1,Z=1}}
+local transform={Rotation={X=0,Y=0,Z=0,W=1},Translation={X=0,Y=0,Z=45},Scale3D={X=1,Y=1,Z=1}}
 -- Reuse the game's vampire veins and alpha fade, independently of hunger/health.
 local texturePath='/Game/_Dawnwalker/Player/VampireHunger/Material/Textures/T_BloodHunger_Stretched.T_BloodHunger_Stretched'
 local function object(path) return need(StaticFindObject(path),path) end
@@ -89,7 +89,12 @@ function M.new(report)
         light:SetMobility(2) -- Movable; attachment follows the pawn without Lua updates.
         light:SetUseTemperature(false)
         light:SetUseInverseSquaredFalloff(false)
-        light:SetLightFalloffExponent(8)
+        light:SetLightFalloffExponent(2)
+        -- Broad fill around the player; suppress this light's shiny hotspots when supported.
+        safe('Radius highlight suppression unavailable; soft light remains enabled',function()
+            signature('/Script/Engine.LightComponent:SetSpecularScale',{{'NewValue','FloatProperty'}})
+            light:SetSpecularScale(0)
+        end)
         -- No self-shadow from the body enclosing the light, fog glow or indirect spill.
         light:SetCastShadows(false)
         light:SetIndirectLightingIntensity(0)
