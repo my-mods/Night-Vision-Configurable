@@ -1,1 +1,1 @@
-Vampire night vision with a 5–50 metre white-light radius or fullscreen brightness, a soft red vampire vignette hidden in menus, and optional colour effects. Toggle with N or hold L3; stays enabled through save loading.
+Vampire night vision with Radius, Fullscreen and Natural modes. Brighten a soft central oval while keeping darkness at the edges, adjust colours and a vampire vignette, and toggle with N or hold L3. Stays enabled through loading.

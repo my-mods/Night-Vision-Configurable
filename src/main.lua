@@ -1,6 +1,6 @@
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
-local settings={enabled=1,nightVisionMode=1,radiusMeters=6,vignette=1,vignetteOpacity=20,
+local settings={enabled=1,nightVisionMode=1,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
     monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,controllerInput=1,debugLogging=0}
 local warnings={}
 local warningCount=0
@@ -19,6 +19,7 @@ local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
 local camera=require('Camera').new(report,directory)
 local appearance=require('Appearance').new(report)
+local natural=require('Natural').new(report)
 local engine,gameplay,cameraClass,stickKey,vampireTag,uiManager
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
@@ -39,6 +40,7 @@ local function restoreCamera()
 end
 local function restore()
     local extras=appearance.release()
+    natural.reset()
     return restoreCamera() and extras
 end
 local function clear()
@@ -93,6 +95,7 @@ syncVision=function(pulse,inspect,scopeChecked)
     -- Preserve the toggle while menus/cutscenes hide every owned visual effect.
     if not playable(scope) then
         appearance.hide()
+        natural.release()
         assert(restoreCamera(),'Camera restoration is incomplete')
         return
     end
@@ -100,6 +103,11 @@ syncVision=function(pulse,inspect,scopeChecked)
     if token~=generation then return end
     if form==true and target then appearance.sync(scope,settings,inspect)
     else appearance.release() end
+    -- Natural owns a separate component; its failure must not suspend the
+    -- existing colour controls or either of the other vision modes.
+    if settings.nightVisionMode==2 and form==true and target then
+        if inspect or pulse~=nil then natural.sync(scope.pawn,target,settings,inspect) end
+    else natural.release() end
     if effectFailure and (same(target,effectFailure.target)
         or (not valid(target) and not valid(effectFailure.target))) then
         if effectFailure.attempts>=3 or not inspect then return end
@@ -198,7 +206,7 @@ toggle=function()
         if not ok then report('Optional focus sound skipped: '..tostring(err)) end
         if settings.debugLogging==1 then
             trace(string.format('Vision on: mode=%s, vignette=%d/%d%%, B&W=%d%%, red=%d%%, keep blood red=%d, red brightness=%d%%.',
-                settings.nightVisionMode==0 and 'Radius' or 'Fullscreen',settings.vignette,
+                ({[0]='Radius',[1]='Fullscreen',[2]='Natural'})[settings.nightVisionMode],settings.vignette,
                 settings.vignetteOpacity,settings.monochrome,settings.redMonochrome,settings.keepBloodRed,settings.redBrightnessPercent))
         end
     else trace('Activation requires vampire form.') end
@@ -292,8 +300,10 @@ local function apply(values)
         or settings.keepBloodRed~=values.keepBloodRed
         or settings.redBrightnessPercent~=values.redBrightnessPercent
         or settings.radiusMeters~=values.radiusMeters
+        or settings.naturalFocusSize~=values.naturalFocusSize or settings.naturalSoftness~=values.naturalSoftness
         or settings.nightVisionMode~=values.nightVisionMode or settings.vignette~=values.vignette
         or settings.vignetteOpacity~=values.vignetteOpacity or settings.redMonochrome~=values.redMonochrome
+    if settings.nightVisionMode~=values.nightVisionMode then natural.reset() end
     for k,v in pairs(values) do settings[k]=v end
     stats.count,stats.elapsed,stats.repairs=0,0,0
     if settings.enabled~=1 then wanted=false;clear();return end

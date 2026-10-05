@@ -1,6 +1,6 @@
 # Natural vision assets
 
-This Unreal Engine 5.5 project contains the original assets for the Natural night vision prototype. Open `Dawnwalker.uproject` with Unreal Editor 5.5.4. The assets use engine classes only; they require no custom runtime plugin or native DLL.
+This Unreal Engine 5.5 project contains the original assets for Natural night vision. Open `Dawnwalker.uproject` with Unreal Editor 5.5.4. The assets use engine classes only; they require no custom runtime plugin or native DLL.
 
 `M_NaturalVision` is a post-process material at **Scene Color After Tonemapping**. It samples `PostProcessInput0` once and blends an enhanced scene colour into the original with a smooth oval in viewport coordinates. Its Custom expression is also provided as `SourceAssets/NaturalVision.hlsl`; update the expression when editing that source file.
 
@@ -15,12 +15,12 @@ The component exposes these functions:
 | `InitializeNatural()` | Create and retain the material instance, register its blendable, and return whether the instance is valid. Call once on each new component. |
 | `ConfigureNatural(BrightnessPercent, FocusSizePercent, SoftnessPercent)` | Set the three scalar parameters. Brightness accepts 25–300, size 40–100 and softness 20–100. Suggested values are 200, 90 and 70. |
 
-Create the component on the current player actor with deferred registration, initialize and configure it, finish registration, then set `bEnabled`. Disable and destroy the owned component when its player or camera is no longer current. `src/Natural.lua` supplies bounded creation, configuration and cleanup without calling blendable interfaces from Lua. The normal entry point does not enable this prototype yet.
+Create the component on the current player actor with deferred registration, initialize and configure it, finish registration, then set `bEnabled`. Disable and destroy the owned component when its player or camera is no longer current. `src/Natural.lua` supplies bounded creation, configuration and cleanup without calling blendable interfaces from Lua. `src/main.lua` selects it for mode 2, retains activation intent through supported loading/camera transitions, and releases it on menus, deactivation and human form.
 
 The Lua module loads the generated class directly through `KismetSystemLibrary.MakeSoftClassPath`, `Conv_SoftClassPathToSoftClassRef` and `LoadClassAsset_Blocking`. UE4SS's `LoadAsset` searches the game's asset registry, which does not contain these original mod assets. The direct load uses the mounted package without replacing or modifying the game's registry.
 
 For Windows cooking, use the project's packaging settings and retain inline material shader code. Include only the two assets under `Content/NightVisionConfigurable` in the mod's container. Keep their `/Game/NightVisionConfigurable` package names and the `Dawnwalker` project mount. The project settings, editor source assets and engine content are authoring inputs, not game deployment files.
 
-The development archive retains Radius and Fullscreen and includes this prototype through an optional F8 preview. The Natural menu mode and live size/softness settings depend on confirming the cooked assets in Dawnwalker.
+The archive includes Radius, Fullscreen and Natural. Mode 1 (Fullscreen) remains the default. Natural adds `naturalFocusSize` (40–100, default 90) and `naturalSoftness` (20–100, default 70), both in 5-point steps, and reuses `brightnessPercent` for the central enhancement. Successful component recreation resets the failed-attempt budget; repeated menu visits do not exhaust it.
 
-`preview/main.lua` is the optional F8 test entry point. The current development package uses it in place of `src/main.lua`, together with the other Lua modules and the cooked original assets. Its README, layout note and Vortex override instructions are in `preview/`. This uses game-relative paths under `Dawnwalker/` for both the Lua payload and the container; its `Data` directory contains the layout note only. Keep the Natural menu mode disabled until the prototype is confirmed in game.
+`preview/main.lua` retains the earlier optional F8 authoring test; it is not the normal package entry point. Production uses `src/main.lua` and the metadata/layout files under `package/`. Both Lua and cooked containers use game-relative paths under `Dawnwalker/`; `Data` contains only a layout note.

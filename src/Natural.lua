@@ -127,6 +127,7 @@ function M.new(report)
                 create(pawn,target,settings)
             end
             brightness=settings.brightnessPercent;size=settings.naturalFocusSize;softness=settings.naturalSoftness
+            attempts=0 -- Successful recreation after a menu is not a failed retry.
         end)
         if not ok then diagnostic(err);api.release();return false end
         return true

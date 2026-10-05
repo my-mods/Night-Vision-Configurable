@@ -1,6 +1,6 @@
 [size=5][b][color=#E8C88A]Night Vision - Configurable[/color][/b][/size]
 
-See in the dark with a [b]neutral white-light radius[/b] around your character or [b]Fullscreen[/b] brightness. Add a softly fading vampire vignette, black-and-white shading or red tint in [b]5% steps[/b].
+See in the dark with a [b]neutral white-light radius[/b], [b]Fullscreen[/b] brightness, or [b]Natural[/b] vision: a bright central oval fading into the darkness around the screen. Add a softly fading vampire vignette, black-and-white shading or red tint in [b]5% steps[/b].
 
 Inspired by [url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url], [b]made with permission[/b].
 
@@ -21,15 +21,17 @@ Open [b]Mod Settings > Night Vision - Configurable[/b]. Press Apply to save chan
 
 [list]
 [*][b][color=#A8D5C2]Enabled:[/color][/b] Enables the mod; switching it Off also turns vision off. Enabling it again does not activate vision automatically. Default: On.
-[*][b][color=#A8D5C2]Night Vision Mode:[/color][/b] Radius lights the area around you like a white torch. Fullscreen brightens the whole view. Default: Fullscreen.
+[*][b][color=#A8D5C2]Night Vision Mode:[/color][/b] Radius lights the area around you like a white torch. Fullscreen brightens the whole view. Natural brightens a broad central oval, including distant scenery, with normal darkness at the edges and no activation flash. Use Natural with SDR output. Default: Fullscreen.
+[*][b][color=#A8D5C2]Natural size:[/color][/b] Outer oval size from 40–100% in 5% steps. Shown only in Natural mode. Default: 90%.
+[*][b][color=#A8D5C2]Fade softness:[/color][/b] Portion of Natural’s radius that fades gradually, from 20–100% in 5% steps. Shown only in Natural mode. Default: 70%.
 [*][b][color=#A8D5C2]Light radius:[/color][/b] 5–50 metres in 1-metre steps. Shown only in Radius mode. Default: 6 metres.
 [*][b][color=#A8D5C2]Vignette:[/color][/b] Soft red veins from the game's vampire blood-hunger texture. Hidden in menus; does not trigger hunger or damage effects. Default: On.
 [*][b][color=#A8D5C2]Vignette opacity:[/color][/b] 0–100% strength in 5% steps. Shown only with Vignette On. Default: 20%.
 [*][b][color=#A8D5C2]Black & White:[/color][/b] 0% keeps natural colours; 100% is black and white. Adjustable in 5% steps. Default: 0%.
 [*][b][color=#A8D5C2]Keep blood red:[/color][/b] Preserve red shades with Black & White, including blood and similarly red objects. The vampire border stays red too. Requires HDR output off. Dark or discoloured blood may lose some colour. Default: Off.
 [*][b][color=#A8D5C2]Red brightness:[/color][/b] Shown with Keep blood red On. Brighten preserved world reds from 100–500% in 10% steps. 100% is the original brightness. The border remains separately controlled. Default: 100%.
-[*][b][color=#A8D5C2]Red tint:[/color][/b] 0–100% in 5% steps. Colours only the added light in Radius mode, or the whole view in Fullscreen mode. The border stays red independently. Default: 0%.
-[*][b][color=#A8D5C2]Brightness:[/color][/b] 25–300% in 5% steps. 100% is normal game brightness in Fullscreen mode, or standard light strength in Radius mode. Default: 200%.
+[*][b][color=#A8D5C2]Red tint:[/color][/b] 0–100% in 5% steps. Colours only the added light in Radius mode, or the whole view in Fullscreen mode. Hidden and unused in Natural, retaining its saved value. The border stays red independently. Default: 0%.
+[*][b][color=#A8D5C2]Brightness:[/color][/b] 25–300% in 5% steps. 100% is normal game brightness in Fullscreen and Natural, or standard light strength in Radius. Natural changes only the central oval. Default: 200%.
 [*][b][color=#A8D5C2]Controller shortcut:[/color][/b] Enables the left-stick hold. Keyboard N remains available. Default: On.
 [*][b][color=#A8D5C2]Logging:[/color][/b] Writes setup, activation and aggregate diagnostics to ue4ss/UE4SS.log. Default: Off.
 [/list]
@@ -42,7 +44,7 @@ Menus temporarily hide all vision effects; returning to gameplay restores them w
 
 [list]
 [*][b][color=#A8D5C2]Vortex:[/color][/b] Install Night-Vision-Configurable.zip through Vortex, enable it and deploy.
-[*][b][color=#A8D5C2]Manual:[/color][/b] Copy the archive's Data/NightVisionConfigurable folder into <The Blood of Dawnwalker>/Dawnwalker/Binaries/Win64/ue4ss/Mods, preserving the folder structure.
+[*][b][color=#A8D5C2]Manual:[/color][/b] Copy the archive’s Dawnwalker folder into The Blood of Dawnwalker’s game folder, preserving the folder structure.
 [/list]
 
 [size=4][b][color=#E8C88A]Credits and source[/color][/b][/size]

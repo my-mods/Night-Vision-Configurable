@@ -3,7 +3,7 @@
   <info>
     <name>Night Vision - Configurable</name>
     <modid>NightVisionConfigurable</modid>
-    <description>Vampire night vision with a white-light radius or fullscreen mode, an adjustable red vignette, and Black &amp; White and Red monochrome sliders.</description>
+    <description>Radius, Fullscreen or Natural vampire night vision, with adjustable brightness, a soft red vignette and Black &amp; White shading.</description>
     <author>oOCamilleOo</author>
     <version>0.1.1</version>
     <created_on>2026-09-30</created_on>

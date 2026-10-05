@@ -1,0 +1,1 @@
+Runtime files use game-relative paths under Dawnwalker/: Lua and textures in Binaries/Win64/ue4ss/Mods/NightVisionConfigurable, and original Natural assets in Content/Paks/~mods. This Data folder contains no runtime payload.

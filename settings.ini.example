@@ -1,9 +1,13 @@
 [Settings]
 enabled = 1
-; 0 = Radius, 1 = Fullscreen
+; 0 = Radius, 1 = Fullscreen (default), 2 = Natural
 nightVisionMode = 1
 ; Radius only: 5 to 50 metres, in 1-metre steps
 radiusMeters = 6
+; Natural only: outer oval size, 40 to 100%, in 5% steps
+naturalFocusSize = 90
+; Natural only: fraction of the radius used for falloff, 20 to 100%, in 5% steps
+naturalSoftness = 70
 vignette = 1
 vignetteOpacity = 20
 monochrome = 0
@@ -11,9 +15,9 @@ monochrome = 0
 keepBloodRed = 0
 ; Keep blood red only: 100% = normal, up to 500%, in 10% steps
 redBrightnessPercent = 100
-; Red tint colours the light in Radius mode, the view in Fullscreen mode
+; Red tint colours the light in Radius mode, the view in Fullscreen; unused in Natural
 redMonochrome = 0
-; 25 to 300%, in 5% steps. 100% = normal view / standard radius light
+; 25 to 300%, in 5% steps. 100% = normal Fullscreen/Natural view / standard radius light
 brightnessPercent = 200
 controllerInput = 1
 debugLogging = 0
