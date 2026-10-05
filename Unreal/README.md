@@ -1,4 +1,4 @@
-# Natural vision assets
+# Night vision assets
 
 This Unreal Engine 5.5 project contains the original assets for Natural night vision. Open `Dawnwalker.uproject` with Unreal Editor 5.5.4. The assets use engine classes only; they require no custom runtime plugin or native DLL.
 
@@ -22,8 +22,21 @@ Create the component on the current player actor with deferred registration, ini
 
 The Lua module loads the generated class directly through `KismetSystemLibrary.MakeSoftClassPath`, `Conv_SoftClassPathToSoftClassRef` and `LoadClassAsset_Blocking`. UE4SS's `LoadAsset` searches the game's asset registry, which does not contain these original mod assets. The direct load uses the mounted package without replacing or modifying the game's registry.
 
-For Windows cooking, use the project's packaging settings and retain inline material shader code. Include only the two assets under `Content/NightVisionConfigurable` in the mod's container. Keep their `/Game/NightVisionConfigurable` package names and the `Dawnwalker` project mount. The project settings, editor source assets and engine content are authoring inputs, not game deployment files.
+For Windows cooking, use the project's packaging settings and retain inline material shader code. Include only the four assets under `Content/NightVisionConfigurable` in the mod's container. Keep their `/Game/NightVisionConfigurable` package names and the `Dawnwalker` project mount. The project settings, editor source assets and engine content are authoring inputs, not game deployment files.
 
 The archive includes Radius, Fullscreen and Natural. Mode 2 (Natural) is the default for new configurations; existing saved mode choices are preserved. Natural adds `naturalFocusSize` (40–100, default 90) and `naturalSoftness` (20–100, default 70), both in 5-point steps, and reuses `brightnessPercent` for the central enhancement. Successful component recreation resets the failed-attempt budget; repeated menu visits do not exhaust it.
 
 `preview/main.lua` retains the earlier optional F8 authoring test; it is not the normal package entry point. Production uses `src/main.lua` and the metadata/layout files under `package/`. Both Lua and cooked containers use game-relative paths under `Dawnwalker/`; `Data` contains only a layout note.
+
+
+## Radius vision
+
+`M_RadiusVision` and `BP_RadiusVisionComponent` provide mode 0 with original post-process assets. Radius shares Natural's SDR brightness curve but uses reconstructed visible surface world position and a private player-origin vector. The distance mask is full strength through 35% of the selected radius and fades smoothly to zero at its outer limit. Radius is measured from the player actor, independently of camera offset. It adds no point light, shadows, indirect lighting or specular highlights. Fully black pixels remain black. Depth-based surface selection follows the opaque depth buffer; transparent surfaces need gameplay evaluation.
+
+`InitializeRadius()` creates the owned dynamic material. `ConfigureRadius(BrightnessPercent, RadiusMeters, RedTintPercent)` accepts the existing brightness 25–300%, radius 5–50 metres and red tint 0–100%. `UpdateRadiusOrigin()` obtains the component owner's position and writes `RadiusOrigin` only after movement beyond 0.01 centimetres. The same function runs from the Blueprint's `ReceiveTick` event in Post Update Work while enabled. Tick starts disabled; the Lua manager performs the initial update, finishes registration and enables ticking only for active Radius. It stops ticking and destroys the component on menus, loads, mode changes, deactivation and owner/camera replacement. Settings never use this tick.
+
+Black & White and Keep blood red retain Radius's existing global camera treatment. Radius brightness and red tint are then applied inside the distance mask; the vampire border stays independent. Natural and Fullscreen retain their own behavior. HDR and temporal upscaling require validation in the target game.
+
+Cook all four original assets together and retain their inline shaders. Runtime assets use only engine classes; the authoring plugin is not needed in game. `SourceAssets/RadiusVision.hlsl` is the material's Custom expression source. The component's Blueprint graph is editable in Unreal Editor 5.5.4.
+
+`ConfigureRadiusLogging(Enabled)` follows the existing Logging setting. With it Off, no diagnostic counters advance. With it On, `RadiusChecks` and `RadiusWrites` accumulate for the current component and appear in the existing aggregate log window. No per-frame logging or additional Lua timer is used.

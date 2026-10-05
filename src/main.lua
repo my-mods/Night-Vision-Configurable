@@ -20,6 +20,7 @@ local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetA
 local camera=require('Camera').new(report,directory)
 local appearance=require('Appearance').new(report)
 local natural=require('Natural').new(report)
+local radius=require('Radius').new(report)
 local engine,gameplay,cameraClass,stickKey,vampireTag,uiManager
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
@@ -41,6 +42,7 @@ end
 local function restore()
     local extras=appearance.release()
     natural.reset()
+    radius.reset()
     return restoreCamera() and extras
 end
 local function clear()
@@ -96,6 +98,7 @@ syncVision=function(pulse,inspect,scopeChecked)
     if not playable(scope) then
         appearance.hide()
         natural.release()
+        radius.release()
         assert(restoreCamera(),'Camera restoration is incomplete')
         return
     end
@@ -108,6 +111,9 @@ syncVision=function(pulse,inspect,scopeChecked)
     if settings.nightVisionMode==2 and form==true and target then
         if inspect or pulse~=nil then natural.sync(scope.pawn,target,settings,inspect) end
     else natural.release() end
+    if settings.nightVisionMode==0 and form==true and target then
+        if inspect or pulse~=nil then radius.sync(scope.pawn,target,settings,inspect) end
+    else radius.release() end
     if effectFailure and (same(target,effectFailure.target)
         or (not valid(target) and not valid(effectFailure.target))) then
         if effectFailure.attempts>=3 or not inspect then return end
@@ -238,6 +244,7 @@ poll=function()
         stats.count=stats.count+1;stats.elapsed=stats.elapsed+(os.clock()-started)
         if stats.count>=600 then
             trace(string.format('Input/vision checks: %d, camera repairs: %d, total %.3f ms.',stats.count,stats.repairs,stats.elapsed*1000))
+            local detail=radius.diagnostics();if detail then trace(detail) end
             stats.count,stats.elapsed,stats.repairs=0,0,0
         end
     end
@@ -297,13 +304,14 @@ local function apply(values)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
     local visualChanged=settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
+        or (settings.nightVisionMode==0 and settings.debugLogging~=values.debugLogging)
         or settings.keepBloodRed~=values.keepBloodRed
         or settings.redBrightnessPercent~=values.redBrightnessPercent
         or settings.radiusMeters~=values.radiusMeters
         or settings.naturalFocusSize~=values.naturalFocusSize or settings.naturalSoftness~=values.naturalSoftness
         or settings.nightVisionMode~=values.nightVisionMode or settings.vignette~=values.vignette
         or settings.vignetteOpacity~=values.vignetteOpacity or settings.redMonochrome~=values.redMonochrome
-    if settings.nightVisionMode~=values.nightVisionMode then natural.reset() end
+    if settings.nightVisionMode~=values.nightVisionMode then natural.reset();radius.reset() end
     for k,v in pairs(values) do settings[k]=v end
     stats.count,stats.elapsed,stats.repairs=0,0,0
     if settings.enabled~=1 then wanted=false;clear();return end
