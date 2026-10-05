@@ -376,9 +376,15 @@ ExecuteInGameThread(function()
         ExecuteInGameThread(function()
             if probeRemaining then stopNaturalProbe();print('[NightVisionConfigurable] Natural probe off.\n');return end
             local ok,err=pcall(function()
-                if wanted or settings.enabled~=1 or not current(scope) or not playable(scope)
-                    or vampire(scope)~=true or not activeTarget(scope) then
-                    print('[NightVisionConfigurable] Natural probe: load a vampire save and turn ordinary night vision off first.\n')
+                local blocked
+                if settings.enabled~=1 then blocked='enable Night Vision in its settings first.'
+                elseif wanted then blocked='turn ordinary night vision off with N/L3 first.'
+                elseif not current(scope) then blocked='waiting for the player after loading; try again in gameplay.'
+                elseif not playable(scope) then blocked='close menus and return to gameplay first.'
+                elseif vampire(scope)~=true then blocked='available only while the player is a vampire.'
+                elseif not activeTarget(scope) then blocked='waiting for the gameplay camera; try again.' end
+                if blocked then
+                    print('[NightVisionConfigurable] Natural probe: '..blocked..'\n')
                     return
                 end
                 assert(stopNaturalProbe(),'Previous Natural component cleanup is incomplete')

@@ -17,6 +17,8 @@ The component exposes these functions:
 
 Create the component on the current player actor with deferred registration, initialize and configure it, finish registration, then set `bEnabled`. Disable and destroy the owned component when its player or camera is no longer current. `src/Natural.lua` supplies bounded creation, configuration and cleanup without calling blendable interfaces from Lua. The normal entry point does not enable this prototype yet.
 
+The Lua module loads the generated class directly through `KismetSystemLibrary.MakeSoftClassPath`, `Conv_SoftClassPathToSoftClassRef` and `LoadClassAsset_Blocking`. UE4SS's `LoadAsset` searches the game's asset registry, which does not contain these original mod assets. The direct load uses the mounted package without replacing or modifying the game's registry.
+
 For Windows cooking, use the project's packaging settings and retain inline material shader code. Include only the two assets under `Content/NightVisionConfigurable` in the mod's container. Keep their `/Game/NightVisionConfigurable` package names and the `Dawnwalker` project mount. The project settings, editor source assets and engine content are authoring inputs, not game deployment files.
 
 The existing Radius and Fullscreen package is separate from this prototype. The Natural menu mode, live size/softness settings and production packaging depend on confirming the cooked assets in Dawnwalker.

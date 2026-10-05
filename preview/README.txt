@@ -30,6 +30,7 @@ There is no personal settings.ini, engine-wide configuration or native DLL.
 
 Preview activation and distinct failures use the [NightVisionConfigurable] prefix
 in Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log. Normal Logging remains Off by default.
+If F8 cannot start, this log identifies the unmet gameplay condition or asset error.
 
 Inspired by Night Vision by opogode, with permission. No assets from that mod are
 redistributed. Rebel Wolves created The Blood of Dawnwalker. UE4SS provides Lua;

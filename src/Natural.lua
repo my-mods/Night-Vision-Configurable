@@ -73,11 +73,18 @@ function M.new(report)
         signature('/Script/Engine.ActorComponent:K2_DestroyComponent',{{'Object','ObjectProperty'}})
         local class=StaticFindObject(base)
         if not valid(class) then
-            assert(type(LoadAsset)=='function','LoadAsset missing')
-            class=LoadAsset(base)
-            if not valid(class) then class=StaticFindObject(base) end
+            -- UE4SS LoadAsset queries the game's asset registry, which does not
+            -- contain this original mod package. Resolve the mounted class directly.
+            local library='/Script/Engine.KismetSystemLibrary'
+            signature(library..':MakeSoftClassPath',{{'PathString','StrProperty'},{'ReturnValue','StructProperty'}})
+            signature(library..':Conv_SoftClassPathToSoftClassRef',{{'SoftClassPath','StructProperty'},{'ReturnValue','SoftClassProperty'}})
+            signature(library..':LoadClassAsset_Blocking',{{'AssetClass','SoftClassProperty'},{'ReturnValue','ClassProperty'}})
+            local system=object('/Script/Engine.Default__KismetSystemLibrary')
+            local path=system:MakeSoftClassPath(base)
+            local reference=system:Conv_SoftClassPathToSoftClassRef(path)
+            class=system:LoadClassAsset_Blocking(reference)
         end
-        need(class,'cooked Natural helper class')
+        need(class,'cooked Natural helper class after direct load: '..base)
         signature(base..':InitializeNatural',{{'ReturnValue','BoolProperty'}},true)
         signature(base..':ConfigureNatural',{{'BrightnessPercent','FloatProperty'},
             {'FocusSizePercent','FloatProperty'},{'SoftnessPercent','FloatProperty'}},true)
