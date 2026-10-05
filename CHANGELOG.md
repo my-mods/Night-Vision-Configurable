@@ -2,7 +2,7 @@
 
 ## In development
 
-- Added Natural night vision: a bright central oval with adjustable size and fade, preserving darkness around the edges. Select it in Night Vision Mode and use N/L3.
+- Added Natural night vision: a bright central oval with adjustable size and fade, preserving darkness around the edges. Natural is the default for new configurations. Use N/L3 to toggle.
 
 - Added Red brightness from 100–500% in 10% steps, shown when Keep blood red is On; the border stays separately controlled.
 - Added Keep blood red for Black & White with HDR off; other red objects and the vampire border stay coloured too.

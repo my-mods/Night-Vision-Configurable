@@ -1,6 +1,6 @@
 Night Vision - Configurable 0.1.1 — development build
 
-- Added Natural night vision: a bright central oval with adjustable size and fade, preserving darkness around the edges. Select it in Night Vision Mode and use N/L3.
+- Added Natural night vision: a bright central oval with adjustable size and fade, preserving darkness around the edges. Natural is the default for new configurations. Use N/L3 to toggle.
 
 - Brighten preserved world reds from 100–500% in 10% steps with the Red brightness slider, shown when Keep blood red is On.
 - Added Keep blood red for Black & White with HDR off. Other red objects and the vampire border stay coloured too.

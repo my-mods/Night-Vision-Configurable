@@ -1,7 +1,7 @@
 [Settings]
 enabled = 1
-; 0 = Radius, 1 = Fullscreen (default), 2 = Natural
-nightVisionMode = 1
+; 0 = Radius, 1 = Fullscreen, 2 = Natural (default)
+nightVisionMode = 2
 ; Radius only: 5 to 50 metres, in 1-metre steps
 radiusMeters = 6
 ; Natural only: outer oval size, 40 to 100%, in 5% steps
