@@ -29,7 +29,8 @@ local holdStart,generation=0,0
 local effectFailure,visualElapsed=nil,0
 local reloadSettings
 local hooks={}
-local stats={count=0,elapsed=0,repairs=0}
+local stats={count=0,elapsed=0,maximum=0,repairs=0}
+local soundObjects,soundFunction,soundOrder={}
 local wake,poll,toggle,syncVision
 
 local function cancel(handle) if handle then CancelDelayedAction(handle) end end
@@ -201,13 +202,20 @@ local function sound(s,on)
     -- Optional sound uses the location overload; no delegate marshalling.
     local suffix=on and 'start' or 'end'
     local path='/Game/Audio/AK_Events/Events/UI/Gameplay/Focus_Mode/sfx_focusmode_'..suffix
-    local event=StaticFindObject(path..'.sfx_focusmode_'..suffix)
-    local ak=StaticFindObject('/Script/AkAudio.Default__AkGameplayStatics')
-    local fn=StaticFindObject('/Script/AkAudio.AkGameplayStatics:PostEventAtLocation')
+    local function loaded(name)
+        local value=soundObjects[name]
+        if not valid(value)then value=StaticFindObject(name);soundObjects[name]=value end
+        return value
+    end
+    local event=loaded(path..'.sfx_focusmode_'..suffix)
+    local ak=loaded('/Script/AkAudio.Default__AkGameplayStatics')
+    local fn=loaded('/Script/AkAudio.AkGameplayStatics:PostEventAtLocation')
     if not valid(event) or not valid(ak) or not valid(fn) then return end
+    local order=soundOrder
+    if not same(soundFunction,fn)then
     local expected={AkEvent='ObjectProperty',Location='StructProperty',orientation='StructProperty',
         EventName='StrProperty',WorldContextObject='ObjectProperty',ReturnValue='IntProperty'}
-    local order,seen={},{}
+    local seen={};order={}
     fn:ForEachProperty(function(p)
         local name=p:GetFName():ToString()
         assert(expected[name]==p:GetFullName():match('^(%S+)') and not seen[name],'Unsupported focus sound parameter '..name)
@@ -215,6 +223,8 @@ local function sound(s,on)
         if name~='ReturnValue' then order[#order+1]=name end
     end)
     for name in pairs(expected) do assert(seen[name],'Missing focus sound parameter '..name) end
+    soundFunction=fn;soundOrder=order
+    end
     local values={AkEvent=event,Location=s.pawn:K2_GetActorLocation(),orientation={Pitch=0,Yaw=0,Roll=0},
         EventName='',WorldContextObject=s.pawn}
     local args={}
@@ -297,11 +307,12 @@ poll=function()
         end
     end)
     if started then
-        stats.count=stats.count+1;stats.elapsed=stats.elapsed+(os.clock()-started)
+        local elapsed=os.clock()-started
+        stats.count=stats.count+1;stats.elapsed=stats.elapsed+elapsed;stats.maximum=math.max(stats.maximum,elapsed)
         if stats.count>=600 then
-            trace(string.format('Input/vision checks: %d, camera repairs: %d, total %.3f ms.',stats.count,stats.repairs,stats.elapsed*1000))
+            trace(string.format('Input/vision checks: %d, camera repairs: %d, total %.3f ms, maximum %.3f ms.',stats.count,stats.repairs,stats.elapsed*1000,stats.maximum*1000))
             local detail=radius.diagnostics();if detail then trace(detail) end
-            stats.count,stats.elapsed,stats.repairs=0,0,0
+            stats.count,stats.elapsed,stats.maximum,stats.repairs=0,0,0,0
         end
     end
     if not ok then clear();report('Input/vision stopped until the next lifecycle event: '..tostring(err));return end
