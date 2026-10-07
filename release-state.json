@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "packages": {
+    "main": {
+      "id": "NightVisionConfigurable",
+      "name": "Night Vision - Configurable",
+      "archive": "Night-Vision-Configurable.zip",
+      "packageFormat": 1,
+      "baseline": {
+        "kind": "nexus",
+        "version": "1.0",
+        "normalizedVersion": "1.0.0",
+        "sourceCommit": "800d637645c5af920c0fb10a146b70a4a91816b2",
+        "sourceTag": null,
+        "archiveSha256": "9e4b72cf2470b5b757201355596d302f8c4e9e94ebb9021f468f7f5ed2b651f6",
+        "verifiedAt": "2026-10-07T12:13:15.0059190Z",
+        "nexus": {
+          "game": "thebloodofdawnwalker",
+          "pageId": "694",
+          "modId": "41742787150518",
+          "fileChainId": "8056350",
+          "versionId": "41742787152940",
+          "siteFileId": "3116"
+        }
+      },
+      "bindings": [
+        {
+          "path": "Nexus/metadata.json",
+          "jsonPointer": [
+            "version"
+          ],
+          "members": [
+            "Nexus/metadata.json"
+          ]
+        },
+        {
+          "path": "Nexus/metadata.json",
+          "jsonPointer": [
+            "file",
+            "version"
+          ],
+          "members": [
+            "Nexus/metadata.json"
+          ]
+        },
+        {
+          "path": "package/mod.manifest",
+          "pattern": "<version>(?P<version>[^<]+)</version>",
+          "count": 1,
+          "members": [
+            "mod.manifest"
+          ]
+        },
+        {
+          "path": "package/mod_settings.ini",
+          "pattern": "^Version\\s*=\\s*(?P<version>[^\\r\\n]+)",
+          "count": 1,
+          "members": [
+            "Dawnwalker/Binaries/Win64/ue4ss/Mods/NightVisionConfigurable/mod_settings.ini"
+          ]
+        }
+      ],
+      "excludePaths": [
+        "Optional",
+        "Compatibility",
+        "VortexExtension"
+      ],
+      "pending": {
+        "impact": "minor",
+        "rationale": "Add selectable Fullscreen exposure, brightness up to500% in all modes, and persistent vision through gameplay actions, surveying and inspection.",
+        "majorOverride": false,
+        "reviewedInputs": "888d21d982e39a1769f782e9e8190502d391c016b061db079a942b820f3f6276",
+        "divergenceReviewed": false
+      }
+    }
+  }
+}

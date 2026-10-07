@@ -17,7 +17,7 @@ keepBloodRed = 0
 redBrightnessPercent = 100
 ; Red tint colours nearby scenery in Radius, the view in Fullscreen; unused in Natural
 redMonochrome = 0
-; 25 to 300%, in 5% steps. Multiply: 100% is neutral. Absolute: 100% is 0 EV.
+; 25 to 500%, in 5% steps. Multiply: 100% is neutral. Absolute: 100% is 0 EV.
 brightnessPercent = 200
 ; Fullscreen only: 0 = Multiply (default), 1 = Absolute exposure (-2 to +4 EV)
 brightnessCalculation = 0

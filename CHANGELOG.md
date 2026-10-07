@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Raise maximum brightness to 500% in all three modes; the default remains 200%.
+
 - Choose Multiply or the older Absolute exposure behavior for Fullscreen brightness. Multiply remains the default.
 - Keep night vision and its shortcuts available through gameplay actions such as Voracious Bite and temporary interruptions in player form information.
 - Hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.
