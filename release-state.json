@@ -67,9 +67,9 @@
       ],
       "pending": {
         "impact": "minor",
-        "rationale": "Add selectable Fullscreen exposure, brightness up to500% in all modes, and persistent vision through gameplay actions, surveying and inspection.",
+        "rationale": "Add selectable Fullscreen exposure, brightness up to500% in all modes, and persistent vision through gameplay actions including HUD-hidden bites, surveying and inspection.",
         "majorOverride": false,
-        "reviewedInputs": "888d21d982e39a1769f782e9e8190502d391c016b061db079a942b820f3f6276",
+        "reviewedInputs": "08a3a926bfee63e870b64129c433b545aa9a37972a8caff38f01187304bf126b",
         "divergenceReviewed": false
       }
     }
