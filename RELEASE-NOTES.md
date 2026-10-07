@@ -10,4 +10,5 @@ Night Vision - Configurable 1.0
 - Black & White now uses a percentage picker. Keep blood red and Red brightness hide at 0% without resetting your choices.
 - Fixed missing or ambiguous settings after upgrading. Existing mode choices are preserved.
 - Choose Multiply or Absolute brightness in Fullscreen; Multiply remains the default.
-- Keep enabled night vision during movement-locked gameplay actions such as Voracious Bite.
+- Keep night vision and its shortcuts available through gameplay actions such as Voracious Bite and temporary interruptions in player form information.
+- Hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.

@@ -22,7 +22,7 @@ local appearance=require('Appearance').new(report)
 local natural=require('Natural').new(report)
 local radius=require('Radius').new(report)
 local inspection=require('Inspection').new(report)
-local engine,gameplay,cameraClass,stickKey,vampireTag,uiManager
+local engine,gameplay,cameraClass,stickKey,vampireTag,humanTag,uiManager,cinematics
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
 local holdStart,generation=0,0
@@ -54,7 +54,7 @@ local function clear()
     cancel(timer);timer=nil
     if worker then cancel(worker.handle);worker=nil end
     restore()
-    scope=nil;uiManager=nil;armed=false;latched=false;holdStart=0
+    scope=nil;uiManager=nil;cinematics=nil;armed=false;latched=false;holdStart=0
     effectFailure=nil;visualElapsed=0
 end
 local function current(s)
@@ -85,22 +85,34 @@ local function playState(s,reason)
     end
     return reason=='gameplay' or reason=='tower survey' or reason=='clue inspection' or reason=='scripted action'
 end
-local function playable(s,retainEffect)
+local function playable(s)
     if gameplay:IsGamePaused(s.world) then return playState(s,'paused') end
-    if s.pc.bShowMouseCursor==true then return playState(s,'mouse cursor') end
-    local gameplayVisible=false
+    -- This subsystem owns cinematic dialogues and cutscenes. Gameplay ability
+    -- cameras and movement/look locks are not evidence of a cinematic sequence.
+    if s.cinematicQuery and valid(cinematics) and same(cinematics:GetWorld(),s.world) then
+        local ok,active=pcall(function() return cinematics:IsDialogueActive() end)
+        if ok and active==true then return playState(s,'dialogue or cutscene') end
+        if not ok or type(active)~='boolean' then
+            s.cinematicQuery=false
+            report('Dialogue/cutscene query unavailable; pause and gameplay UI checks remain active.')
+        end
+    end
     if valid(uiManager) and same(uiManager:GetWorld(),s.world) then
         local ok,visible=pcall(function() return uiManager:ShouldShowGameplayWidgets() end)
         if ok and visible==false then return playState(s,'gameplay UI hidden') end
-        gameplayVisible=ok and visible==true
-        if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; input/menu guards remain active.') end
+        if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; pause and cinematic checks remain active.') end
     end
-    if s.pc:IsMoveInputIgnored() then
+    -- Movement context is diagnostic only; skip it entirely with Logging off.
+    if settings.debugLogging~=1 or s.moveQueryFailed then return playState(s,'gameplay') end
+    local moveOK,moveLocked=pcall(function() return s.pc:IsMoveInputIgnored() end)
+    if not moveOK then
+        s.moveQueryFailed=true
+        report('Movement context query unavailable; gameplay vision remains available.')
+    elseif moveLocked==true then
         -- Investigation consumes its own input while normal move/look input is
         -- locked. The current local view must be the game's inspection camera.
         if inspection.matches(s.pc:GetViewTarget(),s.world) then return playState(s,'clue inspection') end
-        -- Scouting locks walking while retaining the player's camera. Only this
-        -- verified tower state may bypass movement locking; menus still win.
+        -- These optional queries only label gameplay context for diagnostics.
         if s.towerQueries then
             local ok,survey=pcall(function()
                 local tower=s.pawn:GetActiveTower()
@@ -110,25 +122,27 @@ local function playable(s,retainEffect)
             if ok and survey then return playState(s,'tower survey') end
             if not ok then
                 s.towerQueries=false
-                report('Tower survey detection unavailable; movement/menu guards remain active.')
+                report('Tower survey detection unavailable; gameplay vision remains available.')
             end
         end
-        -- Attacks and synchronised animations also lock movement. A confirmed
-        -- gameplay view can retain an already enabled effect while input stays
-        -- blocked. Missing UI state keeps the conservative fallback below.
-        if gameplayVisible then
-            return playState(s,'scripted action') and retainEffect==true
-        end
-        return playState(s,'movement locked')
+        return playState(s,'scripted action')
     end
     return playState(s,'gameplay')
 end
 local function vampire(s)
     local asc=s.pawn.AbilitySystemComponent
-    -- Missing/replacing ability data is not confirmation of human form.
-    if not valid(asc) then return nil end
-    local value=asc:HasMatchingGameplayTag(vampireTag)
-    if type(value)=='boolean' then return value end
+    -- Tags can disappear temporarily during gameplay transitions. Only positive,
+    -- unambiguous form evidence changes the last known state for this pawn.
+    if valid(asc) then
+        local ok,isVampire,isHuman=pcall(function()
+            return asc:HasMatchingGameplayTag(vampireTag),asc:HasMatchingGameplayTag(humanTag)
+        end)
+        if ok and type(isVampire)=='boolean' and type(isHuman)=='boolean' and isVampire~=isHuman then
+            s.vampire=isVampire
+            return isVampire
+        elseif not ok then report('Player form query unavailable; retaining this player\'s last confirmed form.') end
+    end
+    if wanted then return s.vampire end
 end
 local function activeTarget(s)
     local target=s.pc:GetViewTarget()
@@ -157,7 +171,9 @@ syncVision=function(pulse,inspect,scopeChecked)
         return
     end
     -- Preserve the toggle while menus/cutscenes hide every owned visual effect.
-    if not playable(scope,true) then
+    local canPlay=playable(scope)
+    if token~=generation then return end
+    if not canPlay then
         appearance.hide()
         natural.release()
         radius.release()
@@ -334,6 +350,10 @@ local function discover(job)
         if not valid(gameplay) then gameplay=StaticFindObject('/Script/Engine.Default__GameplayStatics') end
         if not valid(cameraClass) then cameraClass=StaticFindObject('/Script/Engine.CameraComponent') end
         if not valid(uiManager) then uiManager=FindFirstOf('UIManagerSubsystem') end
+        job.cinematicQuery=supportsQuery('/Script/DialogueSystem.CinematicSubsystem:IsDialogueActive','BoolProperty')
+        if job.cinematicQuery then
+            if not valid(cinematics) then cinematics=FindFirstOf('CinematicSubsystem') end
+        else report('Dialogue/cutscene query missing or incompatible; pause and gameplay UI checks remain active.') end
         inspection.prepare()
         job.towerQueries=supportsQuery('/Script/Dawnwalker.DawnwalkerPlayerCharacter:GetActiveTower','ObjectProperty')
             and supportsQuery('/Script/Engine.Controller:IsLookInputIgnored','BoolProperty')
@@ -348,7 +368,7 @@ local function discover(job)
     if not valid(pc) or not pc:IsLocalController() or not same(pc:GetWorld(),world) then return end
     local pawn=pc.Pawn
     if not valid(pawn) or not same(pawn:GetWorld(),world) then return end
-    return {pc=pc,pawn=pawn,world=world,towerQueries=job.towerQueries}
+    return {pc=pc,pawn=pawn,world=world,towerQueries=job.towerQueries,cinematicQuery=job.cinematicQuery}
 end
 wake=function(reason)
     if loading or settings.enabled~=1 or worker then return end
@@ -415,6 +435,7 @@ end
 ExecuteInGameThread(guarded(function()
     stickKey={KeyName=FName('Gamepad_LeftThumbstick')}
     vampireTag={TagName=FName('Player.IsVampire')}
+    humanTag={TagName=FName('Player.IsHuman')}
     reloadSettings=require('Settings').start(directory,guarded(apply),report)
     hook('/Script/Engine.PlayerController:ClientRestart',guarded(clear),guarded(function() wake('client restart') end))
     -- This native UI event covers controller menus without relying on a mouse cursor.
