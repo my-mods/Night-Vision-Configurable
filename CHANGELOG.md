@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Choose Multiply or the older Absolute exposure behavior for Fullscreen brightness. Multiply remains the default.
+- Keep enabled night vision during movement-locked gameplay actions such as Voracious Bite.
+
 - Reuse validated focus-sound references and report the longest input/vision check when Logging is enabled.
 - Night vision stays available while surveying from scouting towers and inspecting clues on objects, including its keyboard and controller shortcuts.
 

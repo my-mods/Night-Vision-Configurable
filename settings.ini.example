@@ -15,9 +15,11 @@ monochrome = 0
 keepBloodRed = 0
 ; Keep blood red only: 100% = normal, up to 500%, in 10% steps
 redBrightnessPercent = 100
-; Red tint colours the light in Radius mode, the view in Fullscreen; unused in Natural
+; Red tint colours nearby scenery in Radius, the view in Fullscreen; unused in Natural
 redMonochrome = 0
-; 25 to 300%, in 5% steps. 100% = normal Fullscreen/Natural view / standard radius light
+; 25 to 300%, in 5% steps. Multiply: 100% is neutral. Absolute: 100% is 0 EV.
 brightnessPercent = 200
+; Fullscreen only: 0 = Multiply (default), 1 = Absolute exposure (-2 to +4 EV)
+brightnessCalculation = 0
 controllerInput = 1
 debugLogging = 0

@@ -169,16 +169,21 @@ function M.new(report,directory)
             keepRed=false
             report('Keep blood red suspended: another camera colour lookup texture takes priority; regular Black & White remains active.')
         end
-        -- Brightness scales scene colour without replacing the game's exposure/bloom.
-        -- Radius illumination and its red colour belong to the attached light only.
+        -- Multiply preserves the game's exposure. Absolute restores the earlier
+        -- Fullscreen exposure-bias range; masked modes keep their own material.
         local desired={}
         local fullscreen=settings.nightVisionMode==1
-        local brightness=fullscreen and (settings.brightnessPercent/100)*2^((pulse or 0)*1.2) or 1
+        local absolute=fullscreen and settings.brightnessCalculation==1
+        local brightness=fullscreen and not absolute and (settings.brightnessPercent/100)*2^((pulse or 0)*1.2) or 1
+        if absolute then
+            local percent=settings.brightnessPercent
+            desired.AutoExposureBias=(percent<=100 and math.log(percent/100,2) or (percent-100)/50)+(pulse or 0)*1.2
+        end
         local original=h.fields.ColorSaturation
         local red=fullscreen and settings.redMonochrome/100 or 0
         if (red>0 or brightness~=1) and not h.fields.SceneColorTint then
             red=0;brightness=1
-            report('Fullscreen brightness/red tint unavailable: camera colour tint is unsupported; Radius and Black & White remain enabled.')
+            report('Camera colour tint is unsupported; Fullscreen Multiply brightness and red tint are unavailable. Absolute exposure, Natural, Radius and Black & White remain available.')
         end
         local fraction=keepRed and 0 or 1-(1-monochrome/100)*(1-red)
         if keepRed then
@@ -207,7 +212,7 @@ function M.new(report,directory)
             assert(equal(read(pp,name),value) and pp['bOverride_'..name]==flag,'Write verification failed: '..name)
             field.pending=nil
         end
-        local blend=(brightness~=1 or fraction>0 or keepRed) and 1 or h.weight
+        local blend=(absolute or brightness~=1 or fraction>0 or keepRed) and 1 or h.weight
         h.lastWeight=blend
         if not equal(h.camera[h.weightKey],blend) then h.camera[h.weightKey]=blend end
         assert(equal(h.camera[h.weightKey],blend),'Blend weight write failed')

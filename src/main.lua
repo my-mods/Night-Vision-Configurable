@@ -1,7 +1,7 @@
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
 local settings={enabled=1,nightVisionMode=1,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
-    monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,controllerInput=1,debugLogging=0}
+    monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,brightnessCalculation=0,controllerInput=1,debugLogging=0}
 local warnings={}
 local warningCount=0
 local function report(message)
@@ -83,14 +83,16 @@ local function playState(s,reason)
         s.playReason=reason
         if wanted and settings.debugLogging==1 then trace('Vision context: '..reason) end
     end
-    return reason=='gameplay' or reason=='tower survey' or reason=='clue inspection'
+    return reason=='gameplay' or reason=='tower survey' or reason=='clue inspection' or reason=='scripted action'
 end
-local function playable(s)
+local function playable(s,retainEffect)
     if gameplay:IsGamePaused(s.world) then return playState(s,'paused') end
     if s.pc.bShowMouseCursor==true then return playState(s,'mouse cursor') end
+    local gameplayVisible=false
     if valid(uiManager) and same(uiManager:GetWorld(),s.world) then
         local ok,visible=pcall(function() return uiManager:ShouldShowGameplayWidgets() end)
         if ok and visible==false then return playState(s,'gameplay UI hidden') end
+        gameplayVisible=ok and visible==true
         if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; input/menu guards remain active.') end
     end
     if s.pc:IsMoveInputIgnored() then
@@ -110,6 +112,12 @@ local function playable(s)
                 s.towerQueries=false
                 report('Tower survey detection unavailable; movement/menu guards remain active.')
             end
+        end
+        -- Attacks and synchronised animations also lock movement. A confirmed
+        -- gameplay view can retain an already enabled effect while input stays
+        -- blocked. Missing UI state keeps the conservative fallback below.
+        if gameplayVisible then
+            return playState(s,'scripted action') and retainEffect==true
         end
         return playState(s,'movement locked')
     end
@@ -149,7 +157,7 @@ syncVision=function(pulse,inspect,scopeChecked)
         return
     end
     -- Preserve the toggle while menus/cutscenes hide every owned visual effect.
-    if not playable(scope) then
+    if not playable(scope,true) then
         appearance.hide()
         natural.release()
         radius.release()
@@ -375,6 +383,7 @@ local function apply(values)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
     local visualChanged=settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
+        or (settings.nightVisionMode==1 and settings.brightnessCalculation~=values.brightnessCalculation)
         or (settings.nightVisionMode==0 and settings.debugLogging~=values.debugLogging)
         or settings.keepBloodRed~=values.keepBloodRed
         or settings.redBrightnessPercent~=values.redBrightnessPercent
@@ -390,7 +399,10 @@ local function apply(values)
         if effectFailure then effectFailure.attempts=0 end
         endFlash()
         syncVision(0,true)
-        if settings.debugLogging==1 then trace('Appearance settings applied.') end
+        if settings.debugLogging==1 then
+            trace(string.format('Appearance settings applied: mode=%d, brightness=%d%%, Fullscreen calculation=%s.',
+                settings.nightVisionMode,settings.brightnessPercent,settings.brightnessCalculation==1 and 'Absolute' or 'Multiply'))
+        end
     end
     if enabledChanged then wake('settings') end
     if inputChanged then cancel(timer);timer=nil;armed=false;latched=false;holdStart=0;schedulePoll() end
