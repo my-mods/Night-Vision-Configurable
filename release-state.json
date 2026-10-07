@@ -67,9 +67,9 @@
       ],
       "pending": {
         "impact": "minor",
-        "rationale": "Add selectable Fullscreen exposure, brightness up to500% in all modes, and persistent vision through gameplay actions including HUD-hidden bites, surveying and inspection.",
+        "rationale": "Add selectable Fullscreen exposure, brightness up to500% in all modes, and persistent vision through gameplay actions including HUD-hidden bites, surveying and inspection. Includes the HUD-hidden vampire bite persistence correction, 500% brightness in all modes, and current bug-report documentation.",
         "majorOverride": false,
-        "reviewedInputs": "08a3a926bfee63e870b64129c433b545aa9a37972a8caff38f01187304bf126b",
+        "reviewedInputs": "c3b2f6846e250b7eac0b36072393375b5f66ec171c4ae1cd61fc62a82a66137f",
         "divergenceReviewed": false
       }
     }
