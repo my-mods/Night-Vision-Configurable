@@ -67,9 +67,9 @@
       ],
       "pending": {
         "impact": "minor",
-        "rationale": "Add selectable Fullscreen exposure, brightness up to500% in all modes, and persistent vision through gameplay actions including HUD-hidden bites, surveying and inspection. Includes the HUD-hidden vampire bite persistence correction, 500% brightness in all modes, and current bug-report documentation.",
+        "rationale": "Complete Nexus-baseline delta: selectable Fullscreen exposure, brightness to 500 percent in all modes, persistent vision through HUD-hidden bites, surveying and inspection, dependency/public copy; add five Logging levels with preserved legacy preference and Debug-only cooked Radius instrumentation.",
         "majorOverride": false,
-        "reviewedInputs": "c3b2f6846e250b7eac0b36072393375b5f66ec171c4ae1cd61fc62a82a66137f",
+        "reviewedInputs": "026d2fcec4b35674f18dc2e14e05d367661f5af78898c965d1bc3d81bb296805",
         "divergenceReviewed": false
       }
     }

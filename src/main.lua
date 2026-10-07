@@ -1,19 +1,22 @@
+local Log=require('ModLog')
+local logDirectory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
+Log.initialize(logDirectory)
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
 local settings={enabled=1,nightVisionMode=1,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
-    monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,brightnessCalculation=0,controllerInput=1,debugLogging=0}
+    monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,brightnessCalculation=0,controllerInput=1,logLevel=2}
 local warnings={}
 local warningCount=0
 local function report(message)
     if warnings[message] or warningCount>=64 then return end
     warnings[message]=true;warningCount=warningCount+1
-    print('[NightVisionConfigurable] '..message..'\n')
+    Log.warning(message)
 end
 local function trace(message)
-    if settings.debugLogging==1 then print('[NightVisionConfigurable] '..message..'\n') end
+    if settings.logLevel==4 then Log.debug('[NightVisionConfigurable] '..message..'\n') end
 end
 for _,name in ipairs({'ExecuteInGameThread','ExecuteInGameThreadWithDelay','CancelDelayedAction','RegisterHook','RegisterKeyBind'}) do
-    if type(_G[name])~='function' then report('Required UE4SS API missing: '..name); return end
+    if type(_G[name])~='function' then Log.error('Required UE4SS API missing: '..name); return end
 end
 local function valid(o) return o~=nil and o:IsValid() end
 local function same(a,b) return valid(a) and valid(b) and a:GetAddress()==b:GetAddress() end
@@ -81,7 +84,7 @@ end
 local function playState(s,reason)
     if s.playReason~=reason then
         s.playReason=reason
-        if wanted and settings.debugLogging==1 then trace('Vision context: '..reason) end
+        if wanted and settings.logLevel==4 then trace('Vision context: '..reason) end
     end
     return reason=='gameplay' or reason=='tower survey' or reason=='clue inspection' or reason=='scripted action'
 end
@@ -100,7 +103,7 @@ local function playable(s)
     -- Bites and other gameplay actions hide the HUD too. HUD visibility cannot
     -- identify a menu: use the pause and cinematic state checks above instead.
     -- Movement context is diagnostic only; skip it entirely with Logging off.
-    if settings.debugLogging~=1 or s.moveQueryFailed then return playState(s,'gameplay') end
+    if settings.logLevel~=4 or s.moveQueryFailed then return playState(s,'gameplay') end
     local moveOK,moveLocked=pcall(function() return s.pc:IsMoveInputIgnored() end)
     if not moveOK then
         s.moveQueryFailed=true
@@ -160,7 +163,7 @@ syncVision=function(pulse,inspect,scopeChecked)
     if form==false then
         wanted=false;effectFailure=nil
         assert(restore(),'Camera restoration is incomplete')
-        trace('Vision off: human form confirmed.')
+        Log.info('Vision off: human form confirmed.')
         return
     end
     if form==nil then
@@ -209,7 +212,7 @@ syncVision=function(pulse,inspect,scopeChecked)
         elseif pulse~=nil then camera.apply(settings,pulse)
         elseif inspect then
             local changed=camera.refresh(settings)
-            if changed and settings.debugLogging==1 then stats.repairs=stats.repairs+1 end
+            if changed and settings.logLevel==4 then stats.repairs=stats.repairs+1 end
         end
     end)
     if not ok then
@@ -283,7 +286,7 @@ toggle=function()
         wanted=false;effectFailure=nil
         if restore() then
             if current(scope) then pcall(sound,scope,false) end
-            trace('Vision off; owned camera values restored.')
+            Log.info('Vision off; owned camera values restored.')
         end
         return
     end
@@ -297,7 +300,7 @@ toggle=function()
         if settings.nightVisionMode==1 and camera.active() and not effectFailure then flash() end
         local ok,err=pcall(sound,scope,true)
         if not ok then report('Optional focus sound skipped: '..tostring(err)) end
-        if settings.debugLogging==1 then
+        if settings.logLevel==4 then
             trace(string.format('Vision on: mode=%s, vignette=%d/%d%%, B&W=%d%%, red=%d%%, keep blood red=%d, red brightness=%d%%.',
                 ({[0]='Radius',[1]='Fullscreen',[2]='Natural'})[settings.nightVisionMode],settings.vignette,
                 settings.vignetteOpacity,settings.monochrome,settings.redMonochrome,settings.keepBloodRed,settings.redBrightnessPercent))
@@ -307,7 +310,7 @@ toggle=function()
 end
 poll=function()
     timer=nil
-    local started=settings.debugLogging==1 and os.clock() or nil
+    local started=settings.logLevel==4 and os.clock() or nil
     local ok,err=pcall(function()
         if not current(scope) then clear();wake('owner changed');return end
         -- Observe changing form/camera state. Inspect external effect writes at most
@@ -336,7 +339,7 @@ poll=function()
             stats.count,stats.elapsed,stats.maximum,stats.repairs=0,0,0,0
         end
     end
-    if not ok then clear();report('Input/vision stopped until the next lifecycle event: '..tostring(err));return end
+    if not ok then clear();Log.error('Input/vision stopped until the next lifecycle event: '..tostring(err));return end
     schedulePoll()
 end
 local function discover(job)
@@ -376,14 +379,14 @@ wake=function(reason)
         local ok,ready=pcall(discover,job)
         -- A native getter may synchronously cause a lifecycle callback.
         if worker~=job or job.generation~=generation or loading then return end
-        if not ok then worker=nil;report('Readiness stopped: '..tostring(ready));return end
+        if not ok then worker=nil;Log.error('Readiness stopped: '..tostring(ready));return end
         if ready then
             scope=ready;armed=false;latched=false;holdStart=0
             worker=nil
             local resumed,err=pcall(syncVision,nil,true)
             if not resumed then clear();report('Vision recovery suspended: '..tostring(err));return end
             schedulePoll()
-            if settings.debugLogging==1 then trace('Player ready after '..job.attempts..' attempt(s): '..reason) end
+            if settings.logLevel==4 then trace('Player ready after '..job.attempts..' attempt(s): '..reason) end
         elseif job.attempts<20 then job.handle=ExecuteInGameThreadWithDelay(250,attempt)
         else worker=nil;report('Player not ready after 20 attempts; waiting for a lifecycle event or N.') end
     end
@@ -392,15 +395,16 @@ end
 local function guarded(fn)
     return function(...)
         local ok,err=pcall(fn,...)
-        if not ok then clear();report('Operation stopped: '..tostring(err)) end
+        if not ok then clear();Log.error('Operation stopped: '..tostring(err)) end
     end
 end
 local function apply(values)
+    Log.setLevel(values.logLevel)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
     local visualChanged=settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
         or (settings.nightVisionMode==1 and settings.brightnessCalculation~=values.brightnessCalculation)
-        or (settings.nightVisionMode==0 and settings.debugLogging~=values.debugLogging)
+        or (settings.nightVisionMode==0 and settings.logLevel~=values.logLevel)
         or settings.keepBloodRed~=values.keepBloodRed
         or settings.redBrightnessPercent~=values.redBrightnessPercent
         or settings.radiusMeters~=values.radiusMeters
@@ -415,7 +419,7 @@ local function apply(values)
         if effectFailure then effectFailure.attempts=0 end
         endFlash()
         syncVision(0,true)
-        if settings.debugLogging==1 then
+        if settings.logLevel==4 then
             trace(string.format('Appearance settings applied: mode=%d, brightness=%d%%, Fullscreen calculation=%s.',
                 settings.nightVisionMode,settings.brightnessPercent,settings.brightnessCalculation==1 and 'Absolute' or 'Multiply'))
         end

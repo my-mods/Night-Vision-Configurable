@@ -1,3 +1,7 @@
+## Pending development
+
+- Choose how much diagnostic detail to record with five Logging levels, from silent Off to detailed Debug. Warning is the default.
+
 Night Vision - Configurable 1.1.0-dev
 
 - Night vision stays available while surveying from scouting towers and inspecting clues on objects, including its keyboard and controller shortcuts.

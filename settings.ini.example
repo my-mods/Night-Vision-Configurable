@@ -22,4 +22,4 @@ brightnessPercent = 200
 ; Fullscreen only: 0 = Multiply (default), 1 = Absolute exposure (-2 to +4 EV)
 brightnessCalculation = 0
 controllerInput = 1
-debugLogging = 0
+logLevel = 2

@@ -20,7 +20,7 @@ M.schema = {
     {key='brightnessPercent',min=25,max=500,integer=true,default=200},
     {key='brightnessCalculation',values={0,1},default=0},
     {key='controllerInput',values={0,1},default=1},
-    {key='debugLogging',values={0,1},default=0},
+    {key='logLevel',values={0,1,2,3,4},default=2},
 }
 function M.start(directory, apply, report)
     local ids, defaults = {}, {}
@@ -30,14 +30,14 @@ function M.start(directory, apply, report)
     local live = require('UE4SSDawnwalkerSettings').new({
         modId='NightVisionConfigurable', schema=M.schema, ids=ids, report=report,
     })
-    live.attach(apply)
+    live.attach(function(values) require('ModLog').setLevel(values.logLevel);apply(values) end)
     local function reload()
         local values,err=Upgrade.load(directory,M.schema,defaults)
-        if values then live.seed(values); apply(values)
+        if values then require('ModLog').setLevel(values.logLevel);live.seed(values); apply(values)
         else report('Settings: '..tostring(err)..'; previous values retained.') end
     end
     reload()
-    live.start(function(id, callback) return require('dmm_api').subscribe(id, callback) end)
+    live.start(function(id, callback) return require('ModLog').subscribe(directory,id,callback) end)
     return reload
 end
 return M

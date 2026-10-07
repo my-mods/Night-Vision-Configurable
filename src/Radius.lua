@@ -67,7 +67,7 @@ function M.new(report)
     end
     local function configure(settings)
         component:ConfigureRadius(settings.brightnessPercent,settings.radiusMeters,settings.redMonochrome)
-        component:ConfigureRadiusLogging(settings.debugLogging==1)
+        component:ConfigureRadiusLogging(settings.logLevel==4)
     end
     local function create(pawn,target,settings)
         signature('/Script/Engine.Actor:AddComponentByClass',{
@@ -119,13 +119,13 @@ function M.new(report)
             if not api.release() then return false end
             attempts=0
         elseif requestedBrightness~=settings.brightnessPercent or requestedRadius~=settings.radiusMeters
-            or requestedTint~=settings.redMonochrome or requestedLogging~=settings.debugLogging then
+            or requestedTint~=settings.redMonochrome or requestedLogging~=settings.logLevel then
             attempts=0
         end
         requestedPawn=pawn;requestedCamera=target;requestedBrightness=settings.brightnessPercent
-        requestedRadius=settings.radiusMeters;requestedTint=settings.redMonochrome;requestedLogging=settings.debugLogging
+        requestedRadius=settings.radiusMeters;requestedTint=settings.redMonochrome;requestedLogging=settings.logLevel
         local changed=brightness~=settings.brightnessPercent or radius~=settings.radiusMeters
-            or tint~=settings.redMonochrome or logging~=settings.debugLogging
+            or tint~=settings.redMonochrome or logging~=settings.logLevel
         if component and inspect and not valid(component) then component=nil end
         if valid(component) and not changed then return true end
         if not valid(component) and (attempts>=3 or (attempts>0 and not inspect)) then return false end
@@ -136,14 +136,14 @@ function M.new(report)
             else
                 create(pawn,target,settings)
             end
-            brightness=settings.brightnessPercent;radius=settings.radiusMeters;tint=settings.redMonochrome;logging=settings.debugLogging
+            brightness=settings.brightnessPercent;radius=settings.radiusMeters;tint=settings.redMonochrome;logging=settings.logLevel
             attempts=0 -- Successful recreation after a menu is not a failed retry.
         end)
         if not ok then diagnostic(err);api.release();return false end
         return true
     end
     function api.diagnostics()
-        if logging~=1 or not valid(component) then return nil end
+        if logging~=4 or not valid(component) then return nil end
         local ok,result=pcall(function()
             local checks,writes=component.RadiusChecks,component.RadiusWrites
             assert(type(checks)=='number' and type(writes)=='number')

@@ -4,7 +4,12 @@
 local Store=require('SettingsStore')
 local M={}
 function M.complete(original,schema)
-    local text=original:gsub('^\239\187\191','')
+    local text=original
+    -- Retain the BOM; move it to a comment only when it would hide a header
+    -- from the current menu provider. Other player bytes remain unchanged.
+    if text:sub(1,3)=='\239\187\191' and text:sub(4):match('^%s*%[') then
+        text='\239\187\191; UTF-8 preferences\n'..text:sub(4)
+    end
     -- The menu does not accept a BOM before a section or inline section comments.
     -- Normalize Settings headers only; retain any header comment on its own line.
     local lines={}
@@ -65,6 +70,10 @@ function M.complete(original,schema)
     for _,field in ipairs(schema) do
         if not present[field.key] then
             local value=field.key=='brightnessPercent' and migratedBrightness or field.default
+            if field.key=='logLevel' then
+                if present.debugLogging and (present.debugLogging~=1 or (legacy.debugLogging~=0 and legacy.debugLogging~=1)) then return nil,'Invalid or duplicate legacy debugLogging' end
+                value=legacy.debugLogging==1 and 4 or 2
+            end
             added[#added+1]=field.key..' = '..string.format('%.17g',value)
         end
     end
@@ -74,7 +83,7 @@ function M.complete(original,schema)
         text=text..'[Settings]'..newline..table.concat(added,newline)..newline
     end
     -- Validate all existing/new values and reject duplicates before any file write.
-    local values,err=Store.parse(text,schema)
+    local values,err=Store.parse(require('LogSettings').validation(text),schema)
     return values,err,text
 end
 local function readOptional(path)
