@@ -13,3 +13,4 @@ Night Vision - Configurable 1.1.0-dev
 - Keep night vision and its shortcuts available through gameplay actions such as Voracious Bite and temporary interruptions in player form information.
 - Hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.
 - Raise maximum brightness to 500% in all three modes; the default remains 200%.
+- Keep night vision visible during vampire bites and other actions that hide the HUD.

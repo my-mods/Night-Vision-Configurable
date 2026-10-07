@@ -22,7 +22,7 @@ local appearance=require('Appearance').new(report)
 local natural=require('Natural').new(report)
 local radius=require('Radius').new(report)
 local inspection=require('Inspection').new(report)
-local engine,gameplay,cameraClass,stickKey,vampireTag,humanTag,uiManager,cinematics
+local engine,gameplay,cameraClass,stickKey,vampireTag,humanTag,cinematics
 local scope,worker,timer,flashHandle
 local loading,armed,latched,wanted=false,false,false,false
 local holdStart,generation=0,0
@@ -54,7 +54,7 @@ local function clear()
     cancel(timer);timer=nil
     if worker then cancel(worker.handle);worker=nil end
     restore()
-    scope=nil;uiManager=nil;cinematics=nil;armed=false;latched=false;holdStart=0
+    scope=nil;cinematics=nil;armed=false;latched=false;holdStart=0
     effectFailure=nil;visualElapsed=0
 end
 local function current(s)
@@ -94,14 +94,11 @@ local function playable(s)
         if ok and active==true then return playState(s,'dialogue or cutscene') end
         if not ok or type(active)~='boolean' then
             s.cinematicQuery=false
-            report('Dialogue/cutscene query unavailable; pause and gameplay UI checks remain active.')
+            report('Dialogue/cutscene query unavailable; paused menus remain guarded.')
         end
     end
-    if valid(uiManager) and same(uiManager:GetWorld(),s.world) then
-        local ok,visible=pcall(function() return uiManager:ShouldShowGameplayWidgets() end)
-        if ok and visible==false then return playState(s,'gameplay UI hidden') end
-        if not ok then uiManager=nil;report('Gameplay UI visibility unavailable; pause and cinematic checks remain active.') end
-    end
+    -- Bites and other gameplay actions hide the HUD too. HUD visibility cannot
+    -- identify a menu: use the pause and cinematic state checks above instead.
     -- Movement context is diagnostic only; skip it entirely with Logging off.
     if settings.debugLogging~=1 or s.moveQueryFailed then return playState(s,'gameplay') end
     local moveOK,moveLocked=pcall(function() return s.pc:IsMoveInputIgnored() end)
@@ -349,11 +346,10 @@ local function discover(job)
         if not valid(engine) then engine=FindFirstOf('Engine') end
         if not valid(gameplay) then gameplay=StaticFindObject('/Script/Engine.Default__GameplayStatics') end
         if not valid(cameraClass) then cameraClass=StaticFindObject('/Script/Engine.CameraComponent') end
-        if not valid(uiManager) then uiManager=FindFirstOf('UIManagerSubsystem') end
         job.cinematicQuery=supportsQuery('/Script/DialogueSystem.CinematicSubsystem:IsDialogueActive','BoolProperty')
         if job.cinematicQuery then
             if not valid(cinematics) then cinematics=FindFirstOf('CinematicSubsystem') end
-        else report('Dialogue/cutscene query missing or incompatible; pause and gameplay UI checks remain active.') end
+        else report('Dialogue/cutscene query missing or incompatible; paused menus remain guarded.') end
         inspection.prepare()
         job.towerQueries=supportsQuery('/Script/Dawnwalker.DawnwalkerPlayerCharacter:GetActiveTower','ObjectProperty')
             and supportsQuery('/Script/Engine.Controller:IsLookInputIgnored','BoolProperty')
@@ -438,11 +434,12 @@ ExecuteInGameThread(guarded(function()
     humanTag={TagName=FName('Player.IsHuman')}
     reloadSettings=require('Settings').start(directory,guarded(apply),report)
     hook('/Script/Engine.PlayerController:ClientRestart',guarded(clear),guarded(function() wake('client restart') end))
-    -- This native UI event covers controller menus without relying on a mouse cursor.
+    -- Resample actual pause/cinematic state promptly on UI transitions. The HUD
+    -- visibility value itself must never suspend a gameplay action.
     hook('/Script/DogwoodUI.UIManagerSubsystem:SetShowGameplayWidgets',function() end,guarded(function(context)
         local manager=context:get()
         if current(scope) and valid(manager) and same(manager:GetWorld(),scope.world) then
-            uiManager=manager;syncVision(nil,true)
+            syncVision(nil,true)
         end
     end))
     local lastLoading

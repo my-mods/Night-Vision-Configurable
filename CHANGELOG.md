@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep night vision visible during vampire bites and other actions that hide the HUD.
+
 - Raise maximum brightness to 500% in all three modes; the default remains 200%.
 
 - Choose Multiply or the older Absolute exposure behavior for Fullscreen brightness. Multiply remains the default.
