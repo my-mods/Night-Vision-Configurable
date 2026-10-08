@@ -1,21 +1,12 @@
-## Pending development
-
-- Choose how much diagnostic detail to record with five Logging levels, from silent Off to detailed Debug. Warning is the default.
-
-# Changelog
-
-## Unreleased
-
-- Keep night vision visible during vampire bites and other actions that hide the HUD.
+## 1.1.0
 
 - Raise maximum brightness to 500% in all three modes; the default remains 200%.
+- Choose Multiply or Absolute exposure for Fullscreen brightness. Multiply remains the default.
+- Keep night vision and its shortcuts available during bites, abilities, surveying and clue inspection.
+- Temporarily hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.
+- Choose Off, Error, Warning, Info or Debug logging; Warning is the default.
 
-- Choose Multiply or the older Absolute exposure behavior for Fullscreen brightness. Multiply remains the default.
-- Keep night vision and its shortcuts available through gameplay actions such as Voracious Bite and temporary interruptions in player form information.
-- Hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.
-
-- Reuse validated focus-sound references and report the longest input/vision check when Logging is enabled.
-- Night vision stays available while surveying from scouting towers and inspecting clues on objects, including its keyboard and controller shortcuts.
+# Changelog
 
 ## 1.0
 

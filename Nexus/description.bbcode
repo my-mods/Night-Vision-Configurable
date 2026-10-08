@@ -1,115 +1,114 @@
 [size=5][b][color=#E8C88A]Night Vision - Configurable[/color][/b][/size]
-
-Explore dark forests and moonlit paths with night vision that suits your taste. Brighten the whole view, keep darkness around the edges, or see more clearly close to your character. Keep natural colours, blend into black and white, or add a red tint and a soft vampire border.
-
-Inspired by [url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url], [b]made with permission[/b].
-
-[size=4][b][color=#E8C88A]Three ways to see the night[/color][/b][/size]
-
-[list]
-[*][b][color=#A8D5C2]Fullscreen — default:[/color][/b] Brightens the whole view, including distant scenery. A brief brightness pulse marks activation.
-[*][b][color=#A8D5C2]Natural:[/color][/b] Brightens a broad central oval and fades gently into the darkness at the edges. Adjust its size and softness to suit your view. Black & White and Keep blood red follow the same oval. No activation flash.
-[*][b][color=#A8D5C2]Radius:[/color][/b] Brightens nearby scenery around your character, then fades smoothly back to normal darkness with distance. Choose a range from 5–50 metres. Red tint follows the same range.
-[/list]
-
-[size=4][b][color=#E8C88A]Controls[/color][/b][/size]
-
-[list]
-[*][b][color=#A8D5C2]Keyboard:[/color][/b] Press N to toggle night vision in vampire form.
-[*][b][color=#A8D5C2]Controller:[/color][/b] Hold L3 / the left stick for 0.6 seconds. Release between toggles.
-[/list]
-
-Night vision stays enabled through save loading until you turn it off or become human. It remains available while surveying from scouting towers and inspecting clues on objects; use Fullscreen or Natural to brighten distant scenery. Gameplay actions such as Voracious Bite retain vision and its shortcuts, including while movement or looking is locked. Menus, cutscenes and dialogues temporarily hide the effect; returning to play brings it back. Hiding the HUD during a bite does not interrupt vision. A cursor alone or temporarily unavailable form information does not turn active vision off. Each new game session starts with vision off.
-
-[size=4][b][color=#E8C88A]Make it your own[/color][/b][/size]
-
-Open [b]Mod Settings > Night Vision - Configurable[/b]. Choose a mode, adjust its appearance and press Apply to see your changes.
-
-[list]
-[*][b][color=#A8D5C2]Brightness:[/color][/b] 25–500%, with 100% matching normal game brightness when using Multiply. Default: 200%.
-[*][b][color=#A8D5C2]Brightness calculation:[/color][/b] Fullscreen only. Multiply preserves the current look and remains the default. Absolute restores the older exposure approach for stronger brightness in dark scenes; 100% is neutral exposure. Natural and Radius keep Multiply.
-[*][b][color=#A8D5C2]Natural size and Fade softness:[/color][/b] Make the bright oval smaller or larger and soften its edges. Size: 40–100% (default 90%); softness: 20–100% (default 70%).
-[*][b][color=#A8D5C2]Vision radius:[/color][/b] Set how far Radius reaches, from 5–50 metres. Default: 6 metres.
-[*][b][color=#A8D5C2]Black & White:[/color][/b] Choose from natural colours at 0% to full black and white at 100%, in 5% steps. In Natural it stays inside the oval; in Fullscreen and Radius it affects the whole view. Default: 0%.
-[*][b][color=#A8D5C2]Keep blood red:[/color][/b] Appears when Black & White is above 0%. Keep red shades coloured while using Black & White. This also includes similarly red clothing and objects; dark or discoloured blood may lose some colour. Default: Off.
-[*][b][color=#A8D5C2]Red brightness:[/color][/b] Make preserved reds more noticeable, from their normal brightness at 100% up to 500%. Appears when Black & White is above 0% and Keep blood red is On. Default: 100%.
-[*][b][color=#A8D5C2]Red tint:[/color][/b] Add red to Fullscreen vision or the nearby area in Radius. Not used in Natural. Range: 0–100%; default: 0%.
-[*][b][color=#A8D5C2]Vignette and opacity:[/color][/b] Add softly fading red vampire veins around the screen, then adjust their strength or switch them off. The border stays red independently of your colour choices and does not cause hunger or damage. Default: On at 20% opacity.
-[*][b][color=#A8D5C2]Enabled and Controller shortcut:[/color][/b] Switch the mod or the left-stick shortcut on or off. Both default to On.
-[*][b][color=#A8D5C2]Logging:[/color][/b] Optional troubleshooting information. Warning is the default; select Debug for troubleshooting.
-[/list]
-
-[b]For a “Sin City” look:[/b] set Black & White to 100%, turn Keep blood red On and raise Red brightness to taste. Leave Red tint at 0% to keep the rest of the scene monochrome.
-
-Only settings for your chosen mode appear. Black & White uses a percentage picker. Most appearance sliders adjust in 5% steps; Vision radius uses 1-metre steps and Red brightness uses 10% steps. Use Natural and Keep blood red with HDR switched off. Completely black areas may remain dark.
-
-Without the menu, close the game and edit NightVisionConfigurable/settings.ini after your first launch, then restart. The included settings.ini.example lists the defaults.
-
-[size=4][b][color=#E8C88A]Installation[/color][/b][/size]
-
-[list]
-[*][b][color=#A8D5C2]Vortex:[/color][/b] Install Night-Vision-Configurable.zip through Vortex, enable it and deploy.
-[*][b][color=#A8D5C2]Manual:[/color][/b] Copy the archive’s Dawnwalker folder into The Blood of Dawnwalker’s game folder, preserving the folder structure.
-[/list]
-
-[size=4][b][color=#E8C88A]Reporting Bugs and other issues[/color][/b][/size]
-
-If you encounter an issue, set [b]Logging[/b] to [b]Debug[/b] in this mod’s Mod Setting Menu settings, apply the change, reproduce the issue. Then start either a bug report in the Bugs tab on Nexus (preferred method for me to track things), or at least start a new thread in comments and send me [b]Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log[/b] from your game folder. Do not report unrelated bugs in other people's threads, please, this makes it impossible for me to track issues.
-
-[size=4][b][color=#E8C88A]Credits and source[/color][/b][/size]
-
-[url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url] — made with permission. This independent implementation does not redistribute the original mod's script or assets.
-
-Thanks to the UE4SS contributors and to mmarcussa for Mod Setting Menu and its integration helper. The bundled ue4ss-common settings modules are MIT licensed. Dependency notices are included in the archive.
-
-Banner and thumbnail: official in-game screenshot from the [url=https://rebel-wolves.com/en/press-center]Rebel Wolves press kit[/url], with a crop and title overlay. Illustrative promotional imagery. The five mode and colour screenshots are unedited captures supplied by the mod author.
-
-[url=https://github.com/my-mods/Night-Vision-Configurable]Source code and documentation[/url]. Authored code and documentation use the MIT license; third-party materials retain their respective rights. The Blood of Dawnwalker belongs to Rebel Wolves and its respective rights holders.
-
-[size=5][b][color=#E8C88A]My Dawnwalker mods[/color][/b][/size]
-
-[size=4][b][color=#E8C88A]Combat your way[/color][/b][/size]
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/161]Easier Parry and Dodge While Blocking[/url][/color][/b]
-Make parry and perfect-dodge windows longer or shorter to suit your timing.
-[b]Highlights:[/b] Consistent same-side or opposite-side ripostes; dodge while blocking; adjustable dodge invulnerability duration.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/480]Combat Camera - Configurable[/url][/color][/b]
-Choose how your camera follows enemies and how you select your targets.
-[b]Highlights:[/b] Free, smooth or native tracking; camera-directed or fixed targets; automatic lock on hit; optional center dot.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/284]Fair Duelist - Customizable Difficulty[/url][/color][/b]
-Build your own difficulty with precise control over combat balance.
-[b]Highlights:[/b] Enemy health and damage; stamina costs; normal, low-health and ranged attack delays; coordinated enemy attacks.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/448]Health Regen - Configurable[/url][/color][/b]
-Set separate health regeneration rates for your human and vampire forms.
-[b]Highlights:[/b] Optional healing during combat; optional recovery of lost vampire segments; healing stops at the selected limit.
-
-[size=4][b][color=#E8C88A]Controls and exploration[/color][/b][/size]
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/203]Controller Tweaks and Remap[/url][/color][/b]
-Tailor your controller layout and make walking and menu access more comfortable.
-[b]Highlights:[/b] 31 controller settings; wider walking range; short press for Map, long press for Game Hub; controller stutter fixes.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/449]Press to Gather - Configurable[/url][/color][/b]
-Gather nearby harvestable resources with one keyboard press or controller hold.
-[b]Highlights:[/b] Adjustable 10–200 m range; 14 controller button choices; support for 17 additional wild plant types.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/711]Less Wildlife[/url][/color][/b]
-Make ordinary boar herds and wolf packs smaller—or larger.
-[b]Highlights:[/b] Population from 10% to 200%; separate boar and wolf switches; quest and named animals keep their normal values.
-
-[size=4][b][color=#E8C88A]Your view, your style[/color][/b][/size]
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/452]Quiet Dawn - Configurable HUD[/url][/color][/b]
-Clear the screen while keeping health and stamina alerts when you need them.
-[b]Highlights:[/b] 17 panels with independent opacity and size; hold-to-peek; configurable combat cues, enemy information and effect icons.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/721]Style Without Sacrifice - Your Transmogrification Wardrobe[/url][/color][/b]
-Choose your equipment's appearance while keeping its stats.
-[b]Highlights:[/b] Separate day and night outfits; three saved presets; character preview; hide selected equipment; collected or all looks.
-
-[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/694]Night Vision - Configurable[/url][/color][/b]
-See in the dark as a vampire with natural colours or your preferred monochrome blend.
-[b]Highlights:[/b] Independent brightness and colour controls; keyboard or controller toggle; stays enabled through save loading and camera changes.
+<br />
+<br />Explore dark forests and moonlit paths with night vision that suits your taste. Brighten the whole view, keep darkness around the edges, or see more clearly close to your character. Keep natural colours, blend into black and white, or add a red tint and a soft vampire border.
+<br />
+<br />Inspired by [url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url], [b]made with permission[/b].
+<br />
+<br />[size=4][b][color=#E8C88A]Three ways to see the night[/color][/b][/size]
+<br />
+<br />[list]
+<br />[*][b][color=#A8D5C2]Fullscreen — default:[/color][/b] Brightens the whole view, including distant scenery. A brief brightness pulse marks activation.[/*]
+<br />[*][b][color=#A8D5C2]Natural:[/color][/b] Brightens a broad central oval and fades gently into the darkness at the edges. Adjust its size and softness to suit your view. Black &amp; White and Keep blood red follow the same oval. No activation flash.[/*]
+<br />[*][b][color=#A8D5C2]Radius:[/color][/b] Brightens nearby scenery around your character, then fades smoothly back to normal darkness with distance. Choose a range from 5–50 metres. Red tint follows the same range.[/*]
+<br />[/list]
+<br />[size=4][b][color=#E8C88A]Controls[/color][/b][/size]
+<br />
+<br />[list]
+<br />[*][b][color=#A8D5C2]Keyboard:[/color][/b] Press N to toggle night vision in vampire form.[/*]
+<br />[*][b][color=#A8D5C2]Controller:[/color][/b] Hold L3 / the left stick for 0.6 seconds. Release between toggles.[/*]
+<br />[/list]
+<br />Night vision stays enabled through save loading, bites, abilities, surveying and clue inspection until you turn it off or become human. Menus, dialogues and cutscenes temporarily hide the effect; returning to play brings it back. Each new game session starts with vision off.
+<br />
+<br />[size=4][b][color=#E8C88A]Make it your own[/color][/b][/size]
+<br />
+<br />Open [b]Mod Settings &gt; Night Vision - Configurable[/b]. Choose a mode, adjust its appearance and press Apply to see your changes.
+<br />
+<br />[list]
+<br />[*][b][color=#A8D5C2]Fullscreen exposure:[/color][/b] Multiply scales the current brightness and remains the default. Absolute uses the older fixed-exposure behavior. Shown only in Fullscreen mode.[/*]
+<br />[*][b][color=#A8D5C2]Brightness:[/color][/b] 25–500%, with 100% matching normal game brightness. Default: 200%.[/*]
+<br />[*][b][color=#A8D5C2]Natural size and Fade softness:[/color][/b] Make the bright oval smaller or larger and soften its edges. Size: 40–100% (default 90%); softness: 20–100% (default 70%).[/*]
+<br />[*][b][color=#A8D5C2]Vision radius:[/color][/b] Set how far Radius reaches, from 5–50 metres. Default: 6 metres.[/*]
+<br />[*][b][color=#A8D5C2]Black &amp; White:[/color][/b] Choose from natural colours at 0% to full black and white at 100%, in 5% steps. In Natural it stays inside the oval; in Fullscreen and Radius it affects the whole view. Default: 0%.[/*]
+<br />[*][b][color=#A8D5C2]Keep blood red:[/color][/b] Appears when Black &amp; White is above 0%. Keep red shades coloured while using Black &amp; White. This also includes similarly red clothing and objects; dark or discoloured blood may lose some colour. Default: Off.[/*]
+<br />[*][b][color=#A8D5C2]Red brightness:[/color][/b] Make preserved reds more noticeable, from their normal brightness at 100% up to 500%. Appears when Black &amp; White is above 0% and Keep blood red is On. Default: 100%.[/*]
+<br />[*][b][color=#A8D5C2]Red tint:[/color][/b] Add red to Fullscreen vision or the nearby area in Radius. Not used in Natural. Range: 0–100%; default: 0%.[/*]
+<br />[*][b][color=#A8D5C2]Vignette and opacity:[/color][/b] Add softly fading red vampire veins around the screen, then adjust their strength or switch them off. The border stays red independently of your colour choices and does not cause hunger or damage. Default: On at 20% opacity.[/*]
+<br />[*][b][color=#A8D5C2]Enabled and Controller shortcut:[/color][/b] Switch the mod or the left-stick shortcut on or off. Both default to On.[/*]
+<br />[*][b][color=#A8D5C2]Logging:[/color][/b] Choose Off, Error, Warning, Info or Debug. Warning is the default; Off is silent. Debug records detailed troubleshooting information in Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log.[/*]
+<br />[/list]
+<br />[b]For a “Sin City” look:[/b] set Black &amp; White to 100%, turn Keep blood red On and raise Red brightness to taste. Leave Red tint at 0% to keep the rest of the scene monochrome.
+<br />
+<br />Only settings for your chosen mode appear. Black &amp; White uses a percentage picker. Most appearance sliders adjust in 5% steps; Vision radius uses 1-metre steps and Red brightness uses 10% steps. Use Natural and Keep blood red with HDR switched off. Completely black areas may remain dark.
+<br />
+<br />Without the menu, close the game and edit NightVisionConfigurable/settings.ini after your first launch, then restart. The included settings.ini.example lists the defaults.
+<br />
+<br />[size=4][b][color=#E8C88A]Installation[/color][/b][/size]
+<br />
+<br />[list]
+<br />[*][b][color=#A8D5C2]Vortex:[/color][/b] Install Night-Vision-Configurable.zip through Vortex, enable it and deploy.[/*]
+<br />[*][b][color=#A8D5C2]Manual:[/color][/b] Copy the archive’s Dawnwalker folder into The Blood of Dawnwalker’s game folder, preserving the folder structure.[/*]
+<br />[/list]
+<br />[size=4][b][color=#E8C88A]Reporting Bugs and other issues[/color][/b][/size]
+<br />
+<br />If you encounter an issue, set [b]Logging[/b] to [b]Debug[/b] in this mod’s Mod Setting Menu settings, apply the change, reproduce the issue. Then start either a bug report in the Bugs tab on Nexus (preferred method for me to track things), or at least start a new thread in comments and send me [b]Dawnwalker/Binaries/Win64/ue4ss/UE4SS.log[/b] from your game folder. Do not report unrelated bugs in other people's threads, please, this makes it impossible for me to track issues.
+<br />
+<br />
+<br />
+<br />[size=4][b][color=#E8C88A]Credits and source[/color][/b][/size]
+<br />
+<br />[url=https://www.nexusmods.com/thebloodofdawnwalker/mods/294]Night Vision by opogode[/url] — made with permission. This independent implementation does not redistribute the original mod's script or assets.
+<br />
+<br />Thanks to the UE4SS contributors and to mmarcussa for Mod Setting Menu and its integration helper. The bundled ue4ss-common settings modules are MIT licensed. Dependency notices are included in the archive.
+<br />
+<br />Banner and thumbnail: official in-game screenshot from the [url=https://rebel-wolves.com/en/press-center]Rebel Wolves press kit[/url], with a crop and title overlay. Illustrative promotional imagery. The five mode and colour screenshots are unedited captures supplied by the mod author.
+<br />
+<br />[url=https://github.com/my-mods/Night-Vision-Configurable]Source code and documentation[/url]. Authored code and documentation use the MIT license; third-party materials retain their respective rights. The Blood of Dawnwalker belongs to Rebel Wolves and its respective rights holders.
+<br />
+<br />[size=5][b][color=#E8C88A]My Dawnwalker mods[/color][/b][/size]
+<br />
+<br />[size=4][b][color=#E8C88A]Combat your way[/color][/b][/size]
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/161]Easier Parry and Dodge While Blocking[/url][/color][/b]
+<br />Make parry and perfect-dodge windows longer or shorter to suit your timing.
+<br />[b]Highlights:[/b] Consistent same-side or opposite-side ripostes; dodge while blocking; adjustable dodge invulnerability duration.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/480]Combat Camera - Configurable[/url][/color][/b]
+<br />Choose how your camera follows enemies and how you select your targets.
+<br />[b]Highlights:[/b] Free, smooth or native tracking; camera-directed or fixed targets; automatic lock on hit; optional center dot.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/284]Fair Duelist - Customizable Difficulty[/url][/color][/b]
+<br />Build your own difficulty with precise control over combat balance.
+<br />[b]Highlights:[/b] Enemy health and damage; stamina costs; normal, low-health and ranged attack delays; coordinated enemy attacks.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/448]Health Regen - Configurable[/url][/color][/b]
+<br />Set separate health regeneration rates for your human and vampire forms.
+<br />[b]Highlights:[/b] Optional healing during combat; optional recovery of lost vampire segments; healing stops at the selected limit.
+<br />
+<br />[size=4][b][color=#E8C88A]Controls and exploration[/color][/b][/size]
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/203]Controller Tweaks and Remap[/url][/color][/b]
+<br />Tailor your controller layout and make walking and menu access more comfortable.
+<br />[b]Highlights:[/b] 31 controller settings; wider walking range; short press for Map, long press for Game Hub; controller stutter fixes.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/449]Press to Gather - Configurable[/url][/color][/b]
+<br />Gather nearby harvestable resources with one keyboard press or controller hold.
+<br />[b]Highlights:[/b] Adjustable 10–200 m range; 14 controller button choices; support for 17 additional wild plant types.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/711]Less Wildlife[/url][/color][/b]
+<br />Make ordinary boar herds and wolf packs smaller—or larger.
+<br />[b]Highlights:[/b] Population from 10% to 200%; separate boar and wolf switches; quest and named animals keep their normal values.
+<br />
+<br />[size=4][b][color=#E8C88A]Your view, your style[/color][/b][/size]
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/452]Quiet Dawn - Configurable HUD[/url][/color][/b]
+<br />Clear the screen while keeping health and stamina alerts when you need them.
+<br />[b]Highlights:[/b] 17 panels with independent opacity and size; hold-to-peek; configurable combat cues, enemy information and effect icons.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/721]Style Without Sacrifice - Your Transmogrification Wardrobe[/url][/color][/b]
+<br />Choose your equipment's appearance while keeping its stats.
+<br />[b]Highlights:[/b] Separate day and night outfits; three saved presets; character preview; hide selected equipment; collected or all looks.
+<br />
+<br />[b][color=#A8D5C2][url=https://www.nexusmods.com/thebloodofdawnwalker/mods/694]Night Vision - Configurable[/url][/color][/b]
+<br />See in the dark as a vampire with natural colours or your preferred monochrome blend.
+<br />[b]Highlights:[/b] Independent brightness and colour controls; keyboard or controller toggle; stays enabled through save loading and camera changes.
+<br />

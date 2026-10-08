@@ -67,9 +67,9 @@
       ],
       "pending": {
         "impact": "minor",
-        "rationale": "Complete Nexus-baseline delta: selectable Fullscreen exposure, brightness to 500 percent in all modes, persistent vision through HUD-hidden bites, surveying and inspection, dependency/public copy; add five Logging levels with preserved legacy preference and Debug-only cooked Radius instrumentation.",
+        "rationale": "Complete Nexus-baseline delta: selectable Fullscreen exposure, brightness to 500 percent in all modes, persistent vision through HUD-hidden bites, surveying and inspection, dependency/public copy; add five Logging levels with preserved legacy preference and Debug-only cooked Radius instrumentation. Release preparation: verified unchanged live Nexus baseline on 2026-10-08; consolidated complete player changelog and preserved published page formatting/history.",
         "majorOverride": false,
-        "reviewedInputs": "026d2fcec4b35674f18dc2e14e05d367661f5af78898c965d1bc3d81bb296805",
+        "reviewedInputs": "420c0c8b704c24f1615acf4b3fde31ce2529c84c959c9e82060a66ed2ed3a99b",
         "divergenceReviewed": false
       }
     }
