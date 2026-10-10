@@ -4,7 +4,7 @@
   "category": "Visuals",
   "author": "oOCamilleOo",
   "language": "English",
-  "version": "1.1.0",
+  "version": "1.1.0-dev",
   "source": "https://github.com/my-mods/Night-Vision-Configurable",
   "tags": [
     "Gameplay",
@@ -18,13 +18,13 @@
   "file": {
     "name": "Night Vision - Configurable",
     "archive": "Night-Vision-Configurable.zip",
-    "version": "1.1.0",
+    "version": "1.1.0-dev",
     "category": "main",
     "descriptionFile": "file-description.txt",
     "allowModManagerDownload": true,
     "primaryModManagerDownload": true,
     "showRequirementsPopUp": true,
-    "description": "Raise maximum brightness to 500% in all three modes; the default remains 200%.\nChoose Multiply or Absolute exposure for Fullscreen brightness. Multiply remains the default.\nKeep night vision and its shortcuts available during bites, abilities, surveying and clue inspection.\nTemporarily hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.\nChoose Off, Error, Warning, Info or Debug logging; Warning is the default."
+    "description": "Raise maximum brightness to 500% in all three modes; the default remains 200%.\nChoose Multiply or Absolute exposure for Fullscreen brightness. Multiply remains the default.\nKeep night vision and its shortcuts available during bites, abilities, surveying and clue inspection.\nTemporarily hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.\nChoose Off, Error, Warning, Info or Debug logging; Warning is the default.\nKeep available vision effects working when unrelated camera colour or bloom settings are unavailable."
   },
   "requirements": [
     {

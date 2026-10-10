@@ -3,3 +3,4 @@ Choose Multiply or Absolute exposure for Fullscreen brightness. Multiply remains
 Keep night vision and its shortcuts available during bites, abilities, surveying and clue inspection.
 Temporarily hide vision during menus, dialogues and cutscenes, then resume automatically when play returns.
 Choose Off, Error, Warning, Info or Debug logging; Warning is the default.
+Keep available vision effects working when unrelated camera colour or bloom settings are unavailable.

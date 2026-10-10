@@ -1,7 +1,6 @@
 -- Camera-local post-processing. Only owned numeric snapshots survive a callback.
 local M = {}
 local vectors = {ColorSaturation={'X','Y','Z','W'},SceneColorTint={'R','G','B','A'}}
-local names = {'AutoExposureBias','BloomIntensity','BloomThreshold','ColorSaturation'}
 local function valid(o) return o ~= nil and o:IsValid() end
 local function finite(n) return type(n)=='number' and n==n and math.abs(n)<math.huge end
 local function equal(a,b)
@@ -104,24 +103,33 @@ function M.new(report,directory)
             settingsKey=settingsKey,weightKey=weightKey}
         h.weight=camera[weightKey]
         assert(finite(h.weight),'Missing camera blend weight')
-        -- Validate every required field before writing any property.
-        for _,name in ipairs(names) do
-            local flag=pp['bOverride_'..name]
-            assert(type(flag)=='boolean','Missing override flag '..name)
-            h.fields[name]={value=read(pp,name),override=flag}
-            h.names[#h.names+1]=name
-        end
-        -- Missing tint support must not disable Radius illumination or B&W.
-        local ok,tint=pcall(function()
-            local flag=pp.bOverride_SceneColorTint;assert(type(flag)=='boolean')
-            return {value=read(pp,'SceneColorTint'),override=flag}
-        end)
-        if ok then h.fields.SceneColorTint=tint;h.names[#h.names+1]='SceneColorTint' end
+        -- Field requirements belong to the requested treatment, not capture.
+        -- Bloom is never read or written by this mod. Natural/Radius material
+        -- brightness requires none of the camera exposure/tint/saturation fields.
+        h.unavailable={}
         held=h
     end
     function api.apply(settings, pulse)
         local h=assert(held,'No camera'); assert(sameCamera(h),'Camera replaced')
         local pp=h.camera[h.settingsKey]
+        local function acquire(name,operation)
+            if h.fields[name] then return true end
+            local ok,field=pcall(function()
+                local flag=pp['bOverride_'..name]
+                assert(type(flag)=='boolean','Missing override flag '..name)
+                return {value=read(pp,name),override=flag}
+            end)
+            if ok then
+                h.fields[name]=field;h.names[#h.names+1]=name
+                h.unavailable[name]=nil
+                return true
+            end
+            if not h.unavailable[name] then
+                h.unavailable[name]=true
+                report(operation..' unavailable: '..tostring(field)..'; other treatments remain available.')
+            end
+            return false
+        end
         -- Natural owns its colour treatment inside the oval material. Restore
         -- our camera overrides on mode changes; retain other effects' baselines.
         local monochrome=settings.nightVisionMode==2 and 0 or settings.monochrome
@@ -174,23 +182,25 @@ function M.new(report,directory)
         local desired={}
         local fullscreen=settings.nightVisionMode==1
         local absolute=fullscreen and settings.brightnessCalculation==1
-        local brightness=fullscreen and not absolute and (settings.brightnessPercent/100)*2^((pulse or 0)*1.2) or 1
+        local absoluteRequested=absolute
+        if absolute then absolute=acquire('AutoExposureBias','Fullscreen Absolute exposure') end
+        local brightness=fullscreen and not absoluteRequested and (settings.brightnessPercent/100)*2^((pulse or 0)*1.2) or 1
         if absolute then
             local percent=settings.brightnessPercent
             desired.AutoExposureBias=(percent<=100 and math.log(percent/100,2) or (percent-100)/50)+(pulse or 0)*1.2
         end
-        local original=h.fields.ColorSaturation
         local red=fullscreen and settings.redMonochrome/100 or 0
-        if (red>0 or brightness~=1) and not h.fields.SceneColorTint then
+        if (red>0 or brightness~=1) and not acquire('SceneColorTint','Fullscreen Multiply brightness and red tint') then
             red=0;brightness=1
-            report('Camera colour tint is unsupported; Fullscreen Multiply brightness and red tint are unavailable. Absolute exposure, Natural, Radius and Black & White remain available.')
         end
         local fraction=keepRed and 0 or 1-(1-monochrome/100)*(1-red)
         if keepRed then
             desired.ColorGradingLUT={isObject=true,reference=h.lut}
             desired.ColorGradingIntensity=monochrome/100
         end
+        if fraction>0 and not acquire('ColorSaturation','Camera Black & White') then fraction=0 end
         if fraction>0 then
+            local original=h.fields.ColorSaturation
             local base=original.override and original.value or {X=1,Y=1,Z=1,W=1}
             desired.ColorSaturation={X=base.X*(1-fraction),Y=base.Y*(1-fraction),Z=base.Z*(1-fraction),W=base.W}
         end
@@ -212,7 +222,7 @@ function M.new(report,directory)
             assert(equal(read(pp,name),value) and pp['bOverride_'..name]==flag,'Write verification failed: '..name)
             field.pending=nil
         end
-        local blend=(absolute or brightness~=1 or fraction>0 or keepRed) and 1 or h.weight
+        local blend=(absolute or brightness~=1 or red>0 or fraction>0 or keepRed) and 1 or h.weight
         h.lastWeight=blend
         if not equal(h.camera[h.weightKey],blend) then h.camera[h.weightKey]=blend end
         assert(equal(h.camera[h.weightKey],blend),'Blend weight write failed')
