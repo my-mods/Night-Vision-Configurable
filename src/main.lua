@@ -3,7 +3,7 @@ local logDirectory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
 Log.initialize(logDirectory)
 -- Night Vision - Configurable. Runtime state only; no save-game writes.
 local directory=assert(debug.getinfo(1,'S').source:match('^@(.+[\\/])'))
-local settings={enabled=1,nightVisionMode=1,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
+local settings={enabled=1,keepDuringCinematics=0,nightVisionMode=1,radiusMeters=6,naturalFocusSize=90,naturalSoftness=70,vignette=1,vignetteOpacity=20,
     monochrome=0,keepBloodRed=0,redBrightnessPercent=100,redMonochrome=0,brightnessPercent=200,brightnessCalculation=0,controllerInput=1,logLevel=2}
 local warnings={}
 local warningCount=0
@@ -88,13 +88,17 @@ local function playState(s,reason)
     end
     return reason=='gameplay' or reason=='tower survey' or reason=='clue inspection' or reason=='scripted action'
 end
-local function playable(s)
+local function playable(s,allowCinematics)
     if gameplay:IsGamePaused(s.world) then return playState(s,'paused') end
     -- This subsystem owns cinematic dialogues and cutscenes. Gameplay ability
     -- cameras and movement/look locks are not evidence of a cinematic sequence.
     if s.cinematicQuery and valid(cinematics) and same(cinematics:GetWorld(),s.world) then
         local ok,active=pcall(function() return cinematics:IsDialogueActive() end)
-        if ok and active==true then return playState(s,'dialogue or cutscene') end
+        if ok and active==true then
+            playState(s,'dialogue or cutscene')
+            -- Only visual updates opt in; dialogue input remains guarded.
+            return allowCinematics==true
+        end
         if not ok or type(active)~='boolean' then
             s.cinematicQuery=false
             report('Dialogue/cutscene query unavailable; paused menus remain guarded.')
@@ -170,8 +174,8 @@ syncVision=function(pulse,inspect,scopeChecked)
         assert(restore(),'Effect restoration is incomplete')
         return
     end
-    -- Preserve the toggle while menus/cutscenes hide every owned visual effect.
-    local canPlay=playable(scope)
+    -- Menus always suppress effects; cinematic visibility is an explicit choice.
+    local canPlay=playable(scope,settings.keepDuringCinematics==1)
     if token~=generation then return end
     if not canPlay then
         appearance.hide()
@@ -402,7 +406,8 @@ local function apply(values)
     Log.setLevel(values.logLevel)
     local enabledChanged=settings.enabled~=values.enabled
     local inputChanged=settings.controllerInput~=values.controllerInput
-    local visualChanged=settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
+    local visualChanged=settings.keepDuringCinematics~=values.keepDuringCinematics
+        or settings.monochrome~=values.monochrome or settings.brightnessPercent~=values.brightnessPercent
         or (settings.nightVisionMode==1 and settings.brightnessCalculation~=values.brightnessCalculation)
         or (settings.nightVisionMode==0 and settings.logLevel~=values.logLevel)
         or settings.keepBloodRed~=values.keepBloodRed

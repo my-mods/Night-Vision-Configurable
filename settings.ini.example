@@ -1,5 +1,7 @@
 [Settings]
 enabled = 1
+; Keep active vision during cutscenes/dialogues; paused menus still hide it.
+keepDuringCinematics = 0
 ; Menu order: 1 = Fullscreen (default), 2 = Natural, 0 = Radius
 nightVisionMode = 1
 ; Radius only: 5 to 50 metres, in 1-metre steps

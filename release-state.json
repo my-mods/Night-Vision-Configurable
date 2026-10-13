@@ -67,9 +67,9 @@
       ],
       "pending": {
         "impact": "minor",
-        "rationale": "Complete direct Nexus-baseline delta: 500-percent brightness and Fullscreen Multiply/Absolute choice; continuous intent through gameplay with confirmed-menu/dialogue/cinematic suppression; cooked material, LUT and HUD lifetime fixes; centralized opt-in logging; SDK-driven per-treatment camera capability acquisition without unused Bloom requirements, preserving supported tint/saturation/exposure including red-only tint when saturation unavailable. Compatible features and maintenance, unchanged defaults/saves.",
+        "rationale": "Complete direct Nexus 1.0 baseline delta: compatible 500-percent brightness and Fullscreen Multiply/Absolute options; gameplay persistence and inspection/camera ownership fixes; centralized logging and per-treatment camera capability handling; optional keepDuringCinematics toggle preserves already-enabled effects in cutscenes/dialogues in all modes, off by default, with paused-menu and cinematic-input guards. Existing numeric identities, saved preferences, defaults and save compatibility retained.",
         "majorOverride": false,
-        "reviewedInputs": "7f5e72b42a3ad827ed0bc7fae1eab02928f9f9e4360247c803c32588f162c09d",
+        "reviewedInputs": "803e1cb84143c0825724ceeb9281fe9352d4e7cf330269945f7402be6d2cb32b",
         "divergenceReviewed": false
       }
     }
