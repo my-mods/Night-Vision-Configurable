@@ -8,19 +8,19 @@
       "packageFormat": 1,
       "baseline": {
         "kind": "nexus",
-        "version": "1.0",
-        "normalizedVersion": "1.0.0",
-        "sourceCommit": "800d637645c5af920c0fb10a146b70a4a91816b2",
+        "version": "1.1.0",
+        "normalizedVersion": "1.1.0",
+        "sourceCommit": "9e8776e7b00c9223b73c6d8903685bd67a87b209",
         "sourceTag": null,
-        "archiveSha256": "9e4b72cf2470b5b757201355596d302f8c4e9e94ebb9021f468f7f5ed2b651f6",
-        "verifiedAt": "2026-10-07T12:13:15.0059190Z",
+        "archiveSha256": "b52dee227b6d6bb5a385b8f81cddabc489e0d98f724db53a1b72ec34414cabcd",
+        "verifiedAt": "2026-10-13T13:59:17.6957464Z",
         "nexus": {
           "game": "thebloodofdawnwalker",
           "pageId": "694",
           "modId": "41742787150518",
           "fileChainId": "8056350",
-          "versionId": "41742787152940",
-          "siteFileId": "3116"
+          "versionId": "41742787152999",
+          "siteFileId": "3175"
         }
       },
       "bindings": [
@@ -67,9 +67,9 @@
       ],
       "pending": {
         "impact": "minor",
-        "rationale": "Complete direct Nexus 1.0 baseline delta: compatible 500-percent brightness and Fullscreen Multiply/Absolute options; gameplay persistence and inspection/camera ownership fixes; centralized logging and per-treatment camera capability handling; optional keepDuringCinematics toggle preserves already-enabled effects in cutscenes/dialogues in all modes, off by default, with paused-menu and cinematic-input guards. Existing numeric identities, saved preferences, defaults and save compatibility retained.",
+        "rationale": "Complete direct published Nexus 1.1.0 delta: optional off-by-default cinematic/dialogue vision retention in all modes; camera-effect capability fixes preserve supported brightness/colour treatments; accurate player copy and release metadata. Compatible addition, preserved settings and saves.",
         "majorOverride": false,
-        "reviewedInputs": "803e1cb84143c0825724ceeb9281fe9352d4e7cf330269945f7402be6d2cb32b",
+        "reviewedInputs": "9c2f52857bea06e1c0231ac9268958040d0f2450339ac4f8c5989af460f5671a",
         "divergenceReviewed": false
       }
     }
