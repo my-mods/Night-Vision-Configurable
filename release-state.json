@@ -8,20 +8,21 @@
       "packageFormat": 1,
       "baseline": {
         "kind": "nexus",
-        "version": "1.1.0",
-        "normalizedVersion": "1.1.0",
-        "sourceCommit": "9e8776e7b00c9223b73c6d8903685bd67a87b209",
-        "sourceTag": null,
-        "archiveSha256": "b52dee227b6d6bb5a385b8f81cddabc489e0d98f724db53a1b72ec34414cabcd",
-        "verifiedAt": "2026-10-13T13:59:17.6957464Z",
+        "version": "1.2.0",
+        "normalizedVersion": "1.2.0",
+        "sourceCommit": "8ded4a94e4694e7f1f34128dbfebe4d9f64cd966",
+        "sourceTag": "v1.2.0",
+        "archiveSha256": "8586dd6dad67af90548340da448b7fab3f93ef1de2b2da43209d05e5de81aaf7",
+        "verifiedAt": "2026-10-13T14:29:27.6599235Z",
         "nexus": {
-          "game": "thebloodofdawnwalker",
-          "pageId": "694",
-          "modId": "41742787150518",
           "fileChainId": "8056350",
-          "versionId": "41742787152999",
-          "siteFileId": "3175"
-        }
+          "siteFileId": "3270",
+          "pageId": "694",
+          "game": "thebloodofdawnwalker",
+          "versionId": "41742787153094",
+          "modId": "41742787150518"
+        },
+        "sourceFingerprint": "9c2f52857bea06e1c0231ac9268958040d0f2450339ac4f8c5989af460f5671a"
       },
       "bindings": [
         {
@@ -66,11 +67,31 @@
         "VortexExtension"
       ],
       "pending": {
-        "impact": "minor",
-        "rationale": "Complete direct published Nexus 1.1.0 delta: optional off-by-default cinematic/dialogue vision retention in all modes; camera-effect capability fixes preserve supported brightness/colour treatments; accurate player copy and release metadata. Compatible addition, preserved settings and saves.",
+        "impact": "none",
+        "rationale": "Matches the verified Nexus release.",
         "majorOverride": false,
         "reviewedInputs": "9c2f52857bea06e1c0231ac9268958040d0f2450339ac4f8c5989af460f5671a",
         "divergenceReviewed": false
+      },
+      "publication": {
+        "nexus": {
+          "destination": "nexus",
+          "verified": true,
+          "verifiedAt": "2026-10-13T14:29:27.6599235Z",
+          "version": "1.2.0",
+          "sourceCommit": "8ded4a94e4694e7f1f34128dbfebe4d9f64cd966",
+          "tag": "v1.2.0",
+          "archiveSha256": "8586dd6dad67af90548340da448b7fab3f93ef1de2b2da43209d05e5de81aaf7",
+          "nexus": {
+            "fileChainId": "8056350",
+            "siteFileId": "3270",
+            "pageId": "694",
+            "game": "thebloodofdawnwalker",
+            "versionId": "41742787153094",
+            "modId": "41742787150518"
+          },
+          "url": "https://www.nexusmods.com/thebloodofdawnwalker/mods/694"
+        }
       }
     }
   }
