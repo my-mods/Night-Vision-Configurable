@@ -1,6 +1,6 @@
 ## 1.2.1
 
-- Restore the sounds played when turning night vision on or off.
+- Updated the mod for patch 1.1.
 
 ## 1.2.0
 
