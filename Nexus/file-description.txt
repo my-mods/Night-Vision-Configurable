@@ -1,1 +1,1 @@
-Restore night vision toggle sounds with the current game audio interface.
+Restore the sounds played when turning night vision on or off.

@@ -70,7 +70,7 @@
         "impact": "patch",
         "rationale": "Complete delta from Nexus 1.2.0: restore optional toggle audio using validated current and legacy reflected signatures; player release notes updated. Modes, settings, shaders and persistence unchanged.",
         "majorOverride": false,
-        "reviewedInputs": "298c93acaa40d8da3fe6ed234ea406b8e2bb8371b5476fe7f55a7cd3f2ad39fa",
+        "reviewedInputs": "3a0c90e2f55da9aa8cc1ecb89edd9478eb3d154e4e2304f4ce9265273e20fe50",
         "divergenceReviewed": false
       },
       "publication": {
