@@ -67,10 +67,10 @@
         "VortexExtension"
       ],
       "pending": {
-        "impact": "none",
-        "rationale": "Matches the verified Nexus release.",
+        "impact": "patch",
+        "rationale": "Complete delta from Nexus 1.2.0: restore optional toggle audio using validated current and legacy reflected signatures; player release notes updated. Modes, settings, shaders and persistence unchanged.",
         "majorOverride": false,
-        "reviewedInputs": "9c2f52857bea06e1c0231ac9268958040d0f2450339ac4f8c5989af460f5671a",
+        "reviewedInputs": "05de53404f9cc6da0dd9180c2d67e3780201306a756e9a5af64f532535fcde24",
         "divergenceReviewed": false
       },
       "publication": {

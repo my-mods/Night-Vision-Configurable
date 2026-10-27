@@ -1,3 +1,7 @@
+## 1.2.1-dev
+
+- Restore night vision toggle sounds with the current game audio interface.
+
 ## 1.2.0
 
 - Add Keep vision during cutscenes and dialogues: an optional toggle for all three modes, Off by default.

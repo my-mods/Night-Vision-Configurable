@@ -241,12 +241,16 @@ local function sound(s,on)
     if not valid(event) or not valid(ak) or not valid(fn) then return end
     local order=soundOrder
     if not same(soundFunction,fn)then
+    -- Wwise's event-object overload does not require the legacy EventName.
+    -- FName casing can retain either spelling; normalize this known alias only.
     local expected={AkEvent='ObjectProperty',Location='StructProperty',orientation='StructProperty',
-        EventName='StrProperty',WorldContextObject='ObjectProperty',ReturnValue='IntProperty'}
+        WorldContextObject='ObjectProperty',ReturnValue='IntProperty'}
     local seen={};order={}
     fn:ForEachProperty(function(p)
-        local name=p:GetFName():ToString()
-        assert(expected[name]==p:GetFullName():match('^(%S+)') and not seen[name],'Unsupported focus sound parameter '..name)
+        local reflectedName=p:GetFName():ToString()
+        local name=reflectedName=='Orientation' and 'orientation' or reflectedName
+        local kind=expected[name] or (name=='EventName' and 'StrProperty')
+        assert(kind==p:GetFullName():match('^(%S+)') and not seen[name],'Unsupported focus sound parameter '..reflectedName)
         seen[name]=true
         if name~='ReturnValue' then order[#order+1]=name end
     end)

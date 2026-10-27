@@ -1,4 +1,3 @@
-# Night Vision - Configurable 1.2.0
+# Night Vision - Configurable 1.2.1-dev
 
-- Add Keep vision during cutscenes and dialogues: an optional toggle for all three modes, Off by default.
-- Fix cases where an unavailable colour effect could prevent other night vision effects from working.
+- Restore night vision toggle sounds with the current game audio interface.
